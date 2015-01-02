@@ -33,40 +33,12 @@
 						</div>
 
 						<div class="widget-body">
-							<a href="{{url('admin/work')}}" class="btn btn-lg"><span class="glyphicon glyphicon-book"></span><br> Works</a> 
-							<a href="{{url('admin/story')}}" class="btn btn-lg"><span class="glyphicon glyphicon-user"></span><br> Stories</a> 
-							<a href="{{url('admin/collection')}}" class="btn btn-lg"><span class="glyphicon glyphicon-envelope"></span><br> Collections</a> 
-							<a href="{{url('admin/gallery')}}" class="btn btn-lg"><span class="glyphicon glyphicon-asterisk"></span><br> Galleries</a> 
+							<a href="{{url('admin/portfolio')}}" class="btn btn-lg"><span class="glyphicon glyphicon-book"></span><br> Portfolios</a> 
+							<a href="{{url('admin/blog')}}" class="btn btn-lg"><span class="glyphicon glyphicon-user"></span><br> Blogs</a> 
+							<a href="{{url('admin/photo')}}" class="btn btn-lg"><span class="glyphicon glyphicon-envelope"></span><br> Photos</a> 
 						</div>
 					</div><!-- /widget-box -->
 				</div>
-
-				<div class="col-sm-6">
-					<div class="widget-box transparent" id="recent-box">
-						<div class="widget-header">
-							<h4 class="lighter smaller">
-								<i class="icon-rss orange"></i>
-								RECENT
-							</h4>
-
-							<div class="widget-toolbar no-border">
-								<ul class="nav nav-tabs" id="recent-tab">
-									<li class="active">
-										<a data-toggle="tab" href="#task-tab">Tasks</a>
-									</li>
-
-									<li>
-										<a data-toggle="tab" href="#member-tab">Members</a>
-									</li>
-
-									<li>
-										<a data-toggle="tab" href="#comment-tab">Comments</a>
-									</li>
-								</ul>
-							</div>
-						</div>
-					</div><!-- /widget-box -->
-				</div><!-- /span -->
 
 			</div><!-- /span -->
 		</div><!-- /row -->

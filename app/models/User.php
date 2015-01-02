@@ -6,8 +6,8 @@ use Illuminate\Auth\Reminders\RemindableInterface;
 class User extends Eloquent implements UserInterface, RemindableInterface {
 	protected $guarded = array('id');
 	protected $fillable = array('username',
-            'password',
-            'last_login');
+		'password',
+		'last_login');
 	/**
 	 * The database table used by the model.
 	 *
@@ -52,18 +52,18 @@ class User extends Eloquent implements UserInterface, RemindableInterface {
 		return $this->email;
 	}
 
-	public function getFullName()
+	public function getRememberToken()
 	{
-		return $this->first_name . ' ' . $this->last_name;
+		return $this->remember_token;
 	}
 
-	public function getProfilePictureUrl()
+	public function setRememberToken($value)
 	{
-		return 'http://graph.facebook.com/'.$this->fb_id.'/picture';
+		$this->remember_token = $value;
 	}
 
-	public function role() 
+	public function getRememberTokenName()
 	{
-		return $this->belongsTo('UserRole');
+		return 'remember_token';
 	}
 }

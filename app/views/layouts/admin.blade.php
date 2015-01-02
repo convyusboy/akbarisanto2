@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8" />
 	<title>Akbarisanto - Admin</title>
-	<link rel="icon" href="{{asset('assets/img/RA_logo_blue.png')}}" type="image/png" sizes="16x16">
+	<link rel="icon" href="{{asset('assets/img/RA_logo_red.png')}}" type="image/png" sizes="16x16">
 
 	<meta name="description" content="Dynamic tables and grids using jqGrid plugin" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -132,87 +132,42 @@
 								</a>
 							</li>
 							<li>
-								<a href="#" class="dropdown-toggle">
+								<a href="{{url('admin/portfolio')}}" class="dropdown-toggle">
 									<i class="icon-desktop"></i>
-									<span class="menu-text"> Works </span>
+									<span class="menu-text"> Portfolios </span>
 									<b class="arrow icon-angle-down"></b>
 								</a>
-								<ul class="submenu">
-									<li>
-										<a href="{{url('admin/work')}}">
-											<i class="icon-list"></i>
-											All Works
-										</a>
-									</li>
-
-									<li>
-										<a href="{{url('admin/work/create')}}">
-											<i class="icon-plus"></i>
-											Add New
-										</a>
-									</li>
-								</ul>
+							</li>
+							<li>
+								<a href="{{url('admin/blog')}}" class="dropdown-toggle">
+									<i class="icon-desktop"></i>
+									<span class="menu-text"> Blogs </span>
+									<b class="arrow icon-angle-down"></b>
+								</a>
+							</li>
+							<li>
+								<a href="{{url('admin/photo')}}" class="dropdown-toggle">
+									<i class="icon-desktop"></i>
+									<span class="menu-text"> Photos </span>
+									<b class="arrow icon-angle-down"></b>
+								</a>
 							</li>
 							<li>
 								<a href="#" class="dropdown-toggle">
 									<i class="icon-desktop"></i>
-									<span class="menu-text"> Stories </span>
+									<span class="menu-text"> Others </span>
 									<b class="arrow icon-angle-down"></b>
 								</a>
 								<ul class="submenu">
 									<li>
-										<a href="{{url('admin/story')}}">
+										<a href="#">
 											<i class="icon-list"></i>
-											All Stories
+											All Others
 										</a>
 									</li>
 
 									<li>
-										<a href="{{url('admin/story/create')}}">
-											<i class="icon-plus"></i>
-											Add New
-										</a>
-									</li>
-								</ul>
-							</li>
-							<li>
-								<a href="#" class="dropdown-toggle">
-									<i class="icon-desktop"></i>
-									<span class="menu-text"> Collections </span>
-									<b class="arrow icon-angle-down"></b>
-								</a>
-								<ul class="submenu">
-									<li>
-										<a href="{{url('admin/collection')}}">
-											<i class="icon-list"></i>
-											All Collections
-										</a>
-									</li>
-
-									<li>
-										<a href="{{url('admin/collection/create')}}">
-											<i class="icon-plus"></i>
-											Add New
-										</a>
-									</li>
-								</ul>
-							</li>
-							<li>
-								<a href="#" class="dropdown-toggle">
-									<i class="icon-desktop"></i>
-									<span class="menu-text"> Galleries </span>
-									<b class="arrow icon-angle-down"></b>
-								</a>
-								<ul class="submenu">
-									<li>
-										<a href="{{url('admin/gallery')}}">
-											<i class="icon-list"></i>
-											All Galleries
-										</a>
-									</li>
-
-									<li>
-										<a href="{{url('admin/gallery/create')}}">
+										<a href="#">
 											<i class="icon-plus"></i>
 											Add New
 										</a>

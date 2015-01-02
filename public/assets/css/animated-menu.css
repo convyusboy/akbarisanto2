@@ -1,0 +1,49 @@
+#topbar {
+	z-index: 99999;
+	position:fixed;
+	width: 100%;
+}
+
+#topbar ul{
+	margin:0;
+	padding:0;
+	list-style-type: none;
+}
+
+#topbar li{
+	width:16.66%;
+	height:50px;
+	float:left;
+	color:#191919;
+	text-align:center;
+	overflow:hidden;
+}
+
+#topbar a{
+	color:#FFF;
+	text-decoration:none;
+}
+
+#topbar p{
+	padding:0px 5px;
+}
+
+.subtext{
+	padding-top:15px;
+	color: #fff;
+}
+
+/*#AAAAFF #9999FF
+#BBDAFF #A8CFFF
+#C0FF97 #ABFF73
+#FFF284 #FFF06A
+#C4ABFE #B89AFE
+#FFBBF7 #FEA9F3*/
+/*url('../img/green-item-bg.jpg') no-repeat*/
+/*Menu Color Classes*/
+.dblue1{background:#AAAAFF;}
+.lblue1{background:#BBDAFF;}
+.green1{background:#C0FF97;}
+.yellow1{background:#FFF284;}
+.purple1{background:#C4ABFE;}
+.pink1{background:#FFBBF7;}

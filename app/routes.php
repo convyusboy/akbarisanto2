@@ -14,8 +14,15 @@
 Route::get('/', 'HomeController@getHome');
 Route::get('home', 'HomeController@getHome');
 
-Route::controller('admin/work', 'AdminWorkController');
-Route::controller('admin/story', 'AdminStoryController');
-Route::controller('admin/collection', 'AdminCollectionController');
-Route::controller('admin/gallery', 'AdminGalleryController');
+Route::controller('admin/portfolio', 'PortfolioController');
+Route::controller('admin/blog', 'BlogController');
+Route::controller('admin/photo', 'PhotoController');
 Route::controller('admin', 'AdminController');
+
+Route::get('send', function()
+{
+    Mail::send('emails.welcome', array('key' => 'value'), function($message)
+    {
+        $message->to('ridho.akbarisanto@yahoo.com', 'User Seputar Pemrograman')->subject('akbarisanto.com feedback');
+    });
+});

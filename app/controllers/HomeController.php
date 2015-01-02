@@ -17,7 +17,15 @@ class HomeController extends BaseController {
 
 	public function getHome()
 	{
-		return View::make('index');
+		// Authenticate via API Key
+		// $client = new Tumblr\API\Client('Etkk7hgob55TMDhK6f6dZuQkJoJ8HL5uj4kqwrPvmWJ8lof5v8');
+
+// Make the request
+		// $client->getBlogPosts('akbarisanto.tumblr.com');
+		
+		$portfolios = Post::where('category_id','=','1')->get();
+		$blogs = Post::where('category_id','=','2')->get();
+		return View::make('index')->with('blogs',$blogs)->with('portfolios',$portfolios);
 	}
 
 }

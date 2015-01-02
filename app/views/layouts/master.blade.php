@@ -3,7 +3,7 @@
 
 <head>
 	<!-- title and favicon -->
-	<title>Akbarisanto - Beta Version</title>
+	<title>Akbarisanto</title>
 	<link rel="icon" href="{{asset('assets/img/RA_logo_red.png')}}" type="image/png" sizes="16x16">
 
     <meta charset="utf-8">
