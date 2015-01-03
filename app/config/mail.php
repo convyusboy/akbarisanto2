@@ -15,7 +15,7 @@ return array(
 	|
 	*/
 
-	'driver' => 'mailgun',
+	'driver' => 'smtp',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -28,7 +28,7 @@ return array(
 	|
 	*/
 
-	'host' => 'smtp.mailgun.org',
+	'host' => 'smtp.mandrillapp.com',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => 'contact.me@akbarisanto.com', 'name' => 'friends of akbarisanto'),
+	'from' => array('address' => 'ridho@akbarisanto.com', 'name' => 'friends of akbarisanto'),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -80,7 +80,7 @@ return array(
 	|
 	*/
 
-	'username' => null,
+	'username' => 'ridho.akbarisanto@yahoo.com',
 
 	/*
 	|--------------------------------------------------------------------------
@@ -93,7 +93,7 @@ return array(
 	|
 	*/
 
-	'password' => null,
+	'password' => 't_NDLREh1M-a3mlT6ot16g',
 
 	/*
 	|--------------------------------------------------------------------------

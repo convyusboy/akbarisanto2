@@ -13,16 +13,9 @@
 
 Route::get('/', 'HomeController@getHome');
 Route::get('home', 'HomeController@getHome');
+Route::post('mail', 'HomeController@postMail');
 
 Route::controller('admin/portfolio', 'PortfolioController');
 Route::controller('admin/blog', 'BlogController');
 Route::controller('admin/photo', 'PhotoController');
 Route::controller('admin', 'AdminController');
-
-Route::get('send', function()
-{
-    Mail::send('emails.welcome', array('key' => 'value'), function($message)
-    {
-        $message->to('ridho.akbarisanto@yahoo.com', 'User Seputar Pemrograman')->subject('akbarisanto.com feedback');
-    });
-});
