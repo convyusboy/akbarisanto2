@@ -1,0 +1,38 @@
+
+<?php $__env->startSection('content'); ?>
+
+<div id="wrapper">
+
+	<div id="bg-group">
+		<div id="bg0" class="yellow2"></div>
+	</div>
+
+	<div id="galleria1-title">Hotwheels</div>
+	<div id="galleria1">
+		<?php foreach ($collections as $collection) { 
+			if ($collection->type_id === 1) {?>
+		<a href="<?php echo asset('assets/uploads/collection/'.$collection->filename); ?>"><img src="<?php echo asset('assets/uploads/collection/'.$collection->filename); ?>" data-title="$collection->name" data-description="$collection->desc"></a>
+		<?php }} ?>
+
+	</div>
+
+<!-- 	<div id="galleria2-title">Collections</div>
+	<div id="galleria2">
+		<?php foreach ($collections as $collection) {
+			if ($collection->type_id === 1) {?>
+		<a href="<?php echo asset('assets/uploads/collection/'.$collection->filename); ?>"><img src="<?php echo asset('assets/uploads/collection/'.$collection->filename); ?>" data-title="$collection->name" data-description="$collection->desc"></a>
+		<?php }} ?>
+
+	</div>
+ -->
+</div>
+
+<script>
+Galleria.loadTheme("<?php echo asset('assets/js/themes/classic/galleria.classic.js'); ?>");
+Galleria.run('#galleria1');
+// Galleria.run('#galleria2');
+</script>
+
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.master', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
