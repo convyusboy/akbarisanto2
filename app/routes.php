@@ -11,11 +11,7 @@
 |
 */
 
-Route::get('/', 'HomeController@getHome');
-Route::get('home', 'HomeController@getHome');
-Route::post('mail', 'HomeController@postMail');
-
-Route::controller('admin/portfolio', 'PortfolioController');
-Route::controller('admin/blog', 'BlogController');
-Route::controller('admin/photo', 'PhotoController');
-Route::controller('admin', 'AdminController');
+Route::get('/', function()
+{
+	return View::make('hello');
+});

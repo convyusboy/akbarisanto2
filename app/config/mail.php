@@ -11,7 +11,7 @@ return array(
 	| sending of e-mail. You may specify which one you're using throughout
 	| your application here. By default, Laravel is setup for SMTP mail.
 	|
-	| Supported: "smtp", "mail", "sendmail"
+	| Supported: "smtp", "mail", "sendmail", "mailgun", "mandrill", "log"
 	|
 	*/
 
@@ -28,16 +28,16 @@ return array(
 	|
 	*/
 
-	'host' => 'smtp.mandrillapp.com',
+	'host' => 'smtp.mailgun.org',
 
 	/*
 	|--------------------------------------------------------------------------
 	| SMTP Host Port
 	|--------------------------------------------------------------------------
 	|
-	| This is the SMTP port used by your application to delivery e-mails to
-	| users of your application. Like the host we have set this value to
-	| stay compatible with the Mailgun e-mail applications by default.
+	| This is the SMTP port used by your application to deliver e-mails to
+	| users of the application. Like the host we have set this value to
+	| stay compatible with the Mailgun e-mail application by default.
 	|
 	*/
 
@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => 'ridho@akbarisanto.com', 'name' => 'friends of akbarisanto'),
+	'from' => array('address' => null, 'name' => null),
 
 	/*
 	|--------------------------------------------------------------------------
@@ -80,7 +80,7 @@ return array(
 	|
 	*/
 
-	'username' => 'ridho.akbarisanto@yahoo.com',
+	'username' => null,
 
 	/*
 	|--------------------------------------------------------------------------
@@ -93,7 +93,7 @@ return array(
 	|
 	*/
 
-	'password' => 't_NDLREh1M-a3mlT6ot16g',
+	'password' => null,
 
 	/*
 	|--------------------------------------------------------------------------
