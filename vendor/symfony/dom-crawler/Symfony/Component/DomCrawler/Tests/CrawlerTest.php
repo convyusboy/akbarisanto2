@@ -47,7 +47,7 @@ class CrawlerTest extends \PHPUnit_Framework_TestCase
 
         $crawler = new Crawler();
         $crawler->add($this->createNodeList()->item(0));
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from an \DOMNode');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMElement');
 
         $crawler = new Crawler();
         $crawler->add('<html><body>Foo</body></html>');
@@ -284,7 +284,7 @@ EOF
         $crawler = new Crawler();
         $crawler->addNode($this->createNodeList()->item(0));
 
-        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from an \DOMNode');
+        $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->addNode() adds nodes from a \DOMElement');
     }
 
     public function testClear()
@@ -363,8 +363,7 @@ EOF
     public function testHtml()
     {
         $this->assertEquals('<img alt="Bar">', $this->createTestCrawler()->filterXPath('//a[5]')->html());
-        $this->assertEquals('<input type="text" value="TextValue" name="TextName"><input type="submit" value="FooValue" name="FooName" id="FooId"><input type="button" value="BarValue" name="BarName" id="BarId"><button value="ButtonValue" name="ButtonName" id="ButtonId"></button>'
-            , trim($this->createTestCrawler()->filterXPath('//form[@id="FooFormId"]')->html()));
+        $this->assertEquals('<input type="text" value="TextValue" name="TextName"><input type="submit" value="FooValue" name="FooName" id="FooId"><input type="button" value="BarValue" name="BarName" id="BarId"><button value="ButtonValue" name="ButtonName" id="ButtonId"></button>', trim($this->createTestCrawler()->filterXPath('//form[@id="FooFormId"]')->html()));
 
         try {
             $this->createTestCrawler()->filterXPath('//ol')->html();
