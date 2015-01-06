@@ -19,6 +19,8 @@
  * due to limitations of PHP's internal mail() function.  You'll get an
  * all-or-nothing result from sending.
  *
+ * @package    Swift
+ * @subpackage Transport
  * @author     Chris Corbyn
  */
 class Swift_Transport_MailTransport implements Swift_Transport
@@ -126,7 +128,9 @@ class Swift_Transport_MailTransport implements Swift_Transport
         $subjectHeader = $message->getHeaders()->get('Subject');
 
         if (!$toHeader) {
-            $this->_throwException(new Swift_TransportException('Cannot send message without a recipient'));
+            throw new Swift_TransportException(
+                'Cannot send message without a recipient'
+                );
         }
         $to = $toHeader->getFieldBody();
         $subject = $subjectHeader ? $subjectHeader->getFieldBody() : '';
@@ -144,10 +148,10 @@ class Swift_Transport_MailTransport implements Swift_Transport
 
         // Separate headers from body
         if (false !== $endHeaders = strpos($messageStr, "\r\n\r\n")) {
-            $headers = substr($messageStr, 0, $endHeaders)."\r\n"; //Keep last EOL
+            $headers = substr($messageStr, 0, $endHeaders) . "\r\n"; //Keep last EOL
             $body = substr($messageStr, $endHeaders + 4);
         } else {
-            $headers = $messageStr."\r\n";
+            $headers = $messageStr . "\r\n";
             $body = '';
         }
 
@@ -164,7 +168,8 @@ class Swift_Transport_MailTransport implements Swift_Transport
         }
 
         if ($this->_invoker->mail($to, $subject, $body, $headers,
-            sprintf($this->_extraParams, $reversePath))) {
+            sprintf($this->_extraParams, $reversePath)))
+        {
             if ($evt) {
                 $evt->setResult(Swift_Events_SendEvent::RESULT_SUCCESS);
                 $evt->setFailedRecipients($failedRecipients);
@@ -202,18 +207,7 @@ class Swift_Transport_MailTransport implements Swift_Transport
         $this->_eventDispatcher->bindEventListener($plugin);
     }
 
-    /** Throw a TransportException, first sending it to any listeners */
-    protected function _throwException(Swift_TransportException $e)
-    {
-        if ($evt = $this->_eventDispatcher->createTransportExceptionEvent($this, $e)) {
-            $this->_eventDispatcher->dispatchEvent($evt, 'exceptionThrown');
-            if (!$evt->bubbleCancelled()) {
-                throw $e;
-            }
-        } else {
-            throw $e;
-        }
-    }
+    // -- Private methods
 
     /** Determine the best-use reverse path for this message */
     private function _getReversePath(Swift_Mime_Message $message)

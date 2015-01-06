@@ -11,7 +11,6 @@
 
 namespace Symfony\Component\Translation\Loader;
 
-use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Translation\MessageCatalogue;
 use Symfony\Component\Translation\Exception\InvalidResourceException;
 use Symfony\Component\Translation\Exception\NotFoundResourceException;
@@ -41,14 +40,11 @@ class QtFileLoader implements LoaderInterface
             throw new NotFoundResourceException(sprintf('File "%s" not found.', $resource));
         }
 
-        try {
-            $dom = XmlUtils::loadFile($resource);
-        } catch (\InvalidArgumentException $e) {
-            throw new InvalidResourceException(sprintf('Unable to load "%s".', $resource), $e->getCode(), $e);
+        $dom = new \DOMDocument();
+        $current = libxml_use_internal_errors(true);
+        if (!@$dom->load($resource, defined('LIBXML_COMPACT') ? LIBXML_COMPACT : 0)) {
+            throw new InvalidResourceException(implode("\n", $this->getXmlErrors()));
         }
-
-        $internalErrors = libxml_use_internal_errors(true);
-        libxml_clear_errors();
 
         $xpath = new \DOMXPath($dom);
         $nodes = $xpath->evaluate('//TS/context/name[text()="'.$domain.'"]');
@@ -57,22 +53,43 @@ class QtFileLoader implements LoaderInterface
         if ($nodes->length == 1) {
             $translations = $nodes->item(0)->nextSibling->parentNode->parentNode->getElementsByTagName('message');
             foreach ($translations as $translation) {
-                $translationValue = (string) $translation->getElementsByTagName('translation')->item(0)->nodeValue;
-
-                if (!empty($translationValue)) {
-                    $catalogue->set(
-                        (string) $translation->getElementsByTagName('source')->item(0)->nodeValue,
-                        $translationValue,
-                        $domain
-                    );
-                }
+                $catalogue->set(
+                    (string) $translation->getElementsByTagName('source')->item(0)->nodeValue,
+                    (string) $translation->getElementsByTagName('translation')->item(0)->nodeValue,
+                    $domain
+                );
                 $translation = $translation->nextSibling;
             }
             $catalogue->addResource(new FileResource($resource));
         }
 
-        libxml_use_internal_errors($internalErrors);
+        libxml_use_internal_errors($current);
 
         return $catalogue;
+    }
+
+    /**
+     * Returns the XML errors of the internal XML parser
+     *
+     * @return array An array of errors
+     */
+    private function getXmlErrors()
+    {
+        $errors = array();
+        foreach (libxml_get_errors() as $error) {
+            $errors[] = sprintf('[%s %s] %s (in %s - line %d, column %d)',
+                LIBXML_ERR_WARNING == $error->level ? 'WARNING' : 'ERROR',
+                $error->code,
+                trim($error->message),
+                $error->file ? $error->file : 'n/a',
+                $error->line,
+                $error->column
+            );
+        }
+
+        libxml_clear_errors();
+        libxml_use_internal_errors(false);
+
+        return $errors;
     }
 }

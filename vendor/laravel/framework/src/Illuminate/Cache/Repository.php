@@ -4,13 +4,8 @@ use Closure;
 use DateTime;
 use ArrayAccess;
 use Carbon\Carbon;
-use Illuminate\Support\Traits\MacroableTrait;
 
 class Repository implements ArrayAccess {
-
-	use MacroableTrait {
-		__call as macroCall;
-	}
 
 	/**
 	 * The cache store implementation.
@@ -25,6 +20,13 @@ class Repository implements ArrayAccess {
 	 * @var int
 	 */
 	protected $default = 60;
+
+	/**
+	 * An array of registered Cache macros.
+	 *
+	 * @var array
+	 */
+	protected $macros = array();
 
 	/**
 	 * Create a new cache repository instance.
@@ -62,45 +64,26 @@ class Repository implements ArrayAccess {
 	}
 
 	/**
-	 * Retrieve an item from the cache and delete it.
-	 *
-	 * @param  string  $key
-	 * @param  mixed   $default
-	 * @return mixed
-	 */
-	public function pull($key, $default = null)
-	{
-		$value = $this->get($key, $default);
-
-		$this->forget($key);
-
-		return $value;
-	}
-
-	/**
 	 * Store an item in the cache.
 	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @param  \DateTime|int  $minutes
+	 * @param  string              $key
+	 * @param  mixed               $value
+	 * @param  Carbon|Datetime|int $minutes
 	 * @return void
 	 */
 	public function put($key, $value, $minutes)
 	{
 		$minutes = $this->getMinutes($minutes);
 
-		if ( ! is_null($minutes))
-		{
-			$this->store->put($key, $value, $minutes);
-		}
+		$this->store->put($key, $value, $minutes);
 	}
 
 	/**
 	 * Store an item in the cache if the key does not exist.
 	 *
-	 * @param  string  $key
-	 * @param  mixed   $value
-	 * @param  \DateTime|int  $minutes
+	 * @param  string              $key
+	 * @param  mixed               $value
+	 * @param  Carbon|Datetime|int $minutes
 	 * @return bool
 	 */
 	public function add($key, $value, $minutes)
@@ -116,9 +99,9 @@ class Repository implements ArrayAccess {
 	/**
 	 * Get an item from the cache, or store the default value.
 	 *
-	 * @param  string  $key
-	 * @param  \DateTime|int  $minutes
-	 * @param  \Closure  $callback
+	 * @param  string              $key
+	 * @param  Carbon|Datetime|int $minutes
+	 * @param  Closure             $callback
 	 * @return mixed
 	 */
 	public function remember($key, $minutes, Closure $callback)
@@ -140,7 +123,7 @@ class Repository implements ArrayAccess {
 	 * Get an item from the cache, or store the default value forever.
 	 *
 	 * @param  string   $key
-	 * @param  \Closure  $callback
+	 * @param  Closure  $callback
 	 * @return mixed
 	 */
 	public function sear($key, Closure $callback)
@@ -152,7 +135,7 @@ class Repository implements ArrayAccess {
 	 * Get an item from the cache, or store the default value forever.
 	 *
 	 * @param  string   $key
-	 * @param  \Closure  $callback
+	 * @param  Closure  $callback
 	 * @return mixed
 	 */
 	public function rememberForever($key, Closure $callback)
@@ -249,36 +232,53 @@ class Repository implements ArrayAccess {
 	/**
 	 * Calculate the number of minutes with the given duration.
 	 *
-	 * @param  \DateTime|int  $duration
-	 * @return int|null
+	 * @param  Carbon|DateTime|int  $duration
+	 * @return int
 	 */
 	protected function getMinutes($duration)
 	{
 		if ($duration instanceof DateTime)
 		{
-			$fromNow = Carbon::instance($duration)->diffInMinutes();
+			$duration = Carbon::instance($duration);
 
-			return $fromNow > 0 ? $fromNow : null;
+			return max(0, Carbon::now()->diffInMinutes($duration, false));
 		}
+		else
+		{
+			return is_string($duration) ? intval($duration) : $duration;
+		}
+	}
 
-		return is_string($duration) ? (int) $duration : $duration;
+	/**
+	 * Register a macro with the Cache class.
+	 *
+	 * @param  string $name
+	 * @param  callable $callback
+	 * @return void
+	 */
+	public function macro($name, $callback)
+	{
+		$this->macros[$name] = $callback;
 	}
 
 	/**
 	 * Handle dynamic calls into macros or pass missing methods to the store.
 	 *
 	 * @param  string  $method
-	 * @param  array   $parameters
+	 * @param  array  $parameters
 	 * @return mixed
 	 */
 	public function __call($method, $parameters)
 	{
-		if (static::hasMacro($method))
+		if (isset($this->macros[$method]))
 		{
-			return $this->macroCall($method, $parameters);
+			return call_user_func_array($this->macros[$method], $parameters);
 		}
-
-		return call_user_func_array(array($this->store, $method), $parameters);
+		else
+		{
+			return call_user_func_array(array($this->store, $method), $parameters);
+		}
 	}
+
 
 }

@@ -11,11 +11,10 @@
 
 namespace Symfony\Component\HttpFoundation\Tests\Session\Storage;
 
-use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeSessionHandler;
-use Symfony\Component\HttpFoundation\Session\Storage\Handler\NullSessionHandler;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Symfony\Component\HttpFoundation\Session\Attribute\AttributeBag;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy;
 use Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy;
 
@@ -137,7 +136,7 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $options = array(
             'cookie_lifetime' => 123456,
             'cookie_path' => '/my/cookie/path',
-            'cookie_domain' => 'symfony.example.com',
+            'cookie_domain' => 'symfony2.example.com',
             'cookie_secure' => true,
             'cookie_httponly' => false,
         );
@@ -159,12 +158,12 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
     public function testSetSaveHandlerException()
     {
         $storage = $this->getStorage();
-        $storage->setSaveHandler(new \stdClass());
+        $storage->setSaveHandler(new \stdClass);
     }
 
     public function testSetSaveHandler53()
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
             $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
         }
 
@@ -176,9 +175,9 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
         $storage->setSaveHandler(new NativeSessionHandler());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
-        $storage->setSaveHandler(new SessionHandlerProxy(new NullSessionHandler()));
+        $storage->setSaveHandler(new SessionHandlerProxy(new SessionHandler()));
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
-        $storage->setSaveHandler(new NullSessionHandler());
+        $storage->setSaveHandler(new SessionHandler());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
         $storage->setSaveHandler(new NativeProxy());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\NativeProxy', $storage->getSaveHandler());
@@ -186,7 +185,7 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testSetSaveHandler54()
     {
-        if (PHP_VERSION_ID < 50400) {
+        if (version_compare(phpversion(), '5.4.0', '<')) {
             $this->markTestSkipped('Test skipped, for PHP 5.4 only.');
         }
 
@@ -200,9 +199,9 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
         $storage->setSaveHandler(new NativeSessionHandler());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
-        $storage->setSaveHandler(new SessionHandlerProxy(new NullSessionHandler()));
+        $storage->setSaveHandler(new SessionHandlerProxy(new SessionHandler()));
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
-        $storage->setSaveHandler(new NullSessionHandler());
+        $storage->setSaveHandler(new SessionHandler());
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Session\Storage\Proxy\SessionHandlerProxy', $storage->getSaveHandler());
     }
 
@@ -211,7 +210,7 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testStartedOutside53()
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
             $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
         }
 
@@ -234,7 +233,7 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanStartOutside54()
     {
-        if (PHP_VERSION_ID < 50400) {
+        if (version_compare(phpversion(), '5.4.0', '<')) {
             $this->markTestSkipped('Test skipped, for PHP 5.4 only.');
         }
 
@@ -253,5 +252,32 @@ class NativeSessionStorageTest extends \PHPUnit_Framework_TestCase
         $key = $storage->getMetadataBag()->getStorageKey();
         $this->assertFalse(isset($_SESSION[$key]));
         $storage->start();
+    }
+}
+
+class SessionHandler implements \SessionHandlerInterface
+{
+    public function open($savePath, $sessionName)
+    {
+    }
+
+    public function close()
+    {
+    }
+
+    public function read($id)
+    {
+    }
+
+    public function write($id, $data)
+    {
+    }
+
+    public function destroy($id)
+    {
+    }
+
+    public function gc($maxlifetime)
+    {
     }
 }

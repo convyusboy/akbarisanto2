@@ -21,47 +21,33 @@ class ProcessPipes
     /** @var array */
     public $pipes = array();
     /** @var array */
-    private $files = array();
-    /** @var array */
     private $fileHandles = array();
     /** @var array */
     private $readBytes = array();
-    /** @var bool    */
+    /** @var Boolean */
     private $useFiles;
-    /** @var bool    */
-    private $ttyMode;
-    /** @var bool    */
-    private $ptyMode;
-    /** @var bool    */
-    private $disableOutput;
 
-    const CHUNK_SIZE = 16384;
-
-    public function __construct($useFiles, $ttyMode, $ptyMode = false, $disableOutput = false)
+    public function __construct($useFiles = false)
     {
-        $this->useFiles = (bool) $useFiles;
-        $this->ttyMode = (bool) $ttyMode;
-        $this->ptyMode = (bool) $ptyMode;
-        $this->disableOutput = (bool) $disableOutput;
+        $this->useFiles = (Boolean) $useFiles;
 
         // Fix for PHP bug #51800: reading from STDOUT pipe hangs forever on Windows if the output is too big.
         // Workaround for this problem is to use temporary files instead of pipes on Windows platform.
         //
+        // Please note that this work around prevents hanging but
+        // another issue occurs : In some race conditions, some data may be
+        // lost or corrupted.
+        //
         // @see https://bugs.php.net/bug.php?id=51800
-        if ($this->useFiles && !$this->disableOutput) {
-            $this->files = array(
-                Process::STDOUT => tempnam(sys_get_temp_dir(), 'sf_proc_stdout'),
-                Process::STDERR => tempnam(sys_get_temp_dir(), 'sf_proc_stderr'),
+        if ($this->useFiles) {
+            $this->fileHandles = array(
+                Process::STDOUT => tmpfile(),
             );
-            foreach ($this->files as $offset => $file) {
-                $this->fileHandles[$offset] = fopen($this->files[$offset], 'rb');
-                if (false === $this->fileHandles[$offset]) {
-                    throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
-                }
+            if (false === $this->fileHandles[Process::STDOUT]) {
+                throw new RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
             }
             $this->readBytes = array(
                 Process::STDOUT => 0,
-                Process::STDERR => 0,
             );
         }
     }
@@ -69,7 +55,6 @@ class ProcessPipes
     public function __destruct()
     {
         $this->close();
-        $this->removeFiles();
     }
 
     /**
@@ -88,7 +73,7 @@ class ProcessPipes
     public function close()
     {
         $this->closeUnixPipes();
-        foreach ($this->fileHandles as $handle) {
+        foreach ($this->fileHandles as $offset => $handle) {
             fclose($handle);
         }
         $this->fileHandles = array();
@@ -114,38 +99,12 @@ class ProcessPipes
      */
     public function getDescriptors()
     {
-        if ($this->disableOutput) {
-            $nullstream = fopen(defined('PHP_WINDOWS_VERSION_BUILD') ? 'NUL' : '/dev/null', 'c');
-
-            return array(
-                array('pipe', 'r'),
-                $nullstream,
-                $nullstream,
-            );
-        }
-
         if ($this->useFiles) {
-            // We're not using pipe on Windows platform as it hangs (https://bugs.php.net/bug.php?id=51800)
-            // We're not using file handles as it can produce corrupted output https://bugs.php.net/bug.php?id=65650
-            // So we redirect output within the commandline and pass the nul device to the process
             return array(
                 array('pipe', 'r'),
-                array('file', 'NUL', 'w'),
-                array('file', 'NUL', 'w'),
-            );
-        }
-
-        if ($this->ttyMode) {
-            return array(
-                array('file', '/dev/tty', 'r'),
-                array('file', '/dev/tty', 'w'),
-                array('file', '/dev/tty', 'w'),
-            );
-        } elseif ($this->ptyMode && Process::isPtySupported()) {
-            return array(
-                array('pty'),
-                array('pty'),
-                array('pty'),
+                $this->fileHandles[Process::STDOUT],
+                // Use a file handle only for STDOUT. Using for both STDOUT and STDERR would trigger https://bugs.php.net/bug.php?id=65650
+                array('pipe', 'w'),
             );
         }
 
@@ -157,23 +116,9 @@ class ProcessPipes
     }
 
     /**
-     * Returns an array of filenames indexed by their related stream in case these pipes use temporary files.
-     *
-     * @return array
-     */
-    public function getFiles()
-    {
-        if ($this->useFiles) {
-            return $this->files;
-        }
-
-        return array();
-    }
-
-    /**
      * Reads data in file handles and pipes.
      *
-     * @param bool $blocking Whether to use blocking calls or not.
+     * @param Boolean $blocking Whether to use blocking calls or not.
      *
      * @return array An array of read data indexed by their fd.
      */
@@ -185,7 +130,7 @@ class ProcessPipes
     /**
      * Reads data in file handles and pipes, closes them if EOF is reached.
      *
-     * @param bool $blocking Whether to use blocking calls or not.
+     * @param Boolean $blocking Whether to use blocking calls or not.
      *
      * @return array An array of read data indexed by their fd.
      */
@@ -197,21 +142,21 @@ class ProcessPipes
     /**
      * Returns if the current state has open file handles or pipes.
      *
-     * @return bool
+     * @return Boolean
      */
     public function hasOpenHandles()
     {
         if (!$this->useFiles) {
-            return (bool) $this->pipes;
+            return (Boolean) $this->pipes;
         }
 
-        return (bool) $this->pipes && (bool) $this->fileHandles;
+        return (Boolean) $this->pipes && (Boolean) $this->fileHandles;
     }
 
     /**
      * Writes stdin data.
      *
-     * @param bool        $blocking Whether to use blocking calls or not.
+     * @param Boolean     $blocking Whether to use blocking calls or not.
      * @param string|null $stdin    The data to write.
      */
     public function write($blocking, $stdin)
@@ -262,8 +207,6 @@ class ProcessPipes
     /**
      * Reads data in file handles.
      *
-     * @param bool $close Whether to close file handles or not.
-     *
      * @return array An array of read data indexed by their fd.
      */
     private function readFileHandles($close = false)
@@ -277,7 +220,7 @@ class ProcessPipes
             $data = '';
             $dataread = null;
             while (!feof($fileHandle)) {
-                if (false !== $dataread = fread($fileHandle, self::CHUNK_SIZE)) {
+                if (false !== $dataread = fread($fileHandle, 16392)) {
                     $data .= $dataread;
                 }
             }
@@ -298,16 +241,13 @@ class ProcessPipes
     /**
      * Reads data in file pipes streams.
      *
-     * @param bool $blocking Whether to use blocking calls or not.
-     * @param bool $close    Whether to close file handles or not.
+     * @param Boolean $blocking Whether to use blocking calls or not.
      *
      * @return array An array of read data indexed by their fd.
      */
     private function readStreams($blocking, $close = false)
     {
         if (empty($this->pipes)) {
-            usleep(Process::TIMEOUT_PRECISION * 1E4);
-
             return array();
         }
 
@@ -335,13 +275,9 @@ class ProcessPipes
 
         foreach ($r as $pipe) {
             $type = array_search($pipe, $this->pipes);
+            $data = fread($pipe, 8192);
 
-            $data = '';
-            while ('' !== $dataread = (string) fread($pipe, self::CHUNK_SIZE)) {
-                $data .= $dataread;
-            }
-
-            if ('' !== $data) {
+            if (strlen($data) > 0) {
                 $read[$type] = $data;
             }
 
@@ -357,7 +293,7 @@ class ProcessPipes
     /**
      * Returns true if a system call has been interrupted.
      *
-     * @return bool
+     * @return Boolean
      */
     private function hasSystemCallBeenInterrupted()
     {
@@ -365,18 +301,5 @@ class ProcessPipes
 
         // stream_select returns false when the `select` system call is interrupted by an incoming signal
         return isset($lastError['message']) && false !== stripos($lastError['message'], 'interrupted system call');
-    }
-
-    /**
-     * Removes temporary files
-     */
-    private function removeFiles()
-    {
-        foreach ($this->files as $filename) {
-            if (file_exists($filename)) {
-                @unlink($filename);
-            }
-        }
-        $this->files = array();
     }
 }

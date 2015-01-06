@@ -1,11 +1,8 @@
 <?php namespace Illuminate\Html;
 
 use Illuminate\Routing\UrlGenerator;
-use Illuminate\Support\Traits\MacroableTrait;
 
 class HtmlBuilder {
-
-	use MacroableTrait;
 
 	/**
 	 * The URL generator instance.
@@ -13,6 +10,13 @@ class HtmlBuilder {
 	 * @var \Illuminate\Routing\UrlGenerator
 	 */
 	protected $url;
+
+	/**
+	 * The registered html macros.
+	 *
+	 * @var array
+	 */
+	protected $macros;
 
 	/**
 	 * Create a new HTML builder instance.
@@ -23,6 +27,18 @@ class HtmlBuilder {
 	public function __construct(UrlGenerator $url = null)
 	{
 		$this->url = $url;
+	}
+
+	/**
+	 * Register a custom HTML macro.
+	 *
+	 * @param  string    $name
+	 * @param  callable  $macro
+	 * @return void
+	 */
+	public function macro($name, $macro)
+	{
+		$this->macros[$name] = $macro;
 	}
 
 	/**
@@ -52,12 +68,11 @@ class HtmlBuilder {
 	 *
 	 * @param  string  $url
 	 * @param  array   $attributes
-	 * @param  bool    $secure
 	 * @return string
 	 */
-	public function script($url, $attributes = array(), $secure = null)
+	public function script($url, $attributes = array())
 	{
-		$attributes['src'] = $this->url->asset($url, $secure);
+		$attributes['src'] = $this->url->asset($url);
 
 		return '<script'.$this->attributes($attributes).'></script>'.PHP_EOL;
 	}
@@ -67,16 +82,15 @@ class HtmlBuilder {
 	 *
 	 * @param  string  $url
 	 * @param  array   $attributes
-	 * @param  bool    $secure
 	 * @return string
 	 */
-	public function style($url, $attributes = array(), $secure = null)
+	public function style($url, $attributes = array())
 	{
 		$defaults = array('media' => 'all', 'type' => 'text/css', 'rel' => 'stylesheet');
 
 		$attributes = $attributes + $defaults;
 
-		$attributes['href'] = $this->url->asset($url, $secure);
+		$attributes['href'] = $this->url->asset($url);
 
 		return '<link'.$this->attributes($attributes).'>'.PHP_EOL;
 	}
@@ -87,14 +101,13 @@ class HtmlBuilder {
 	 * @param  string  $url
 	 * @param  string  $alt
 	 * @param  array   $attributes
-	 * @param  bool    $secure
 	 * @return string
 	 */
-	public function image($url, $alt = null, $attributes = array(), $secure = null)
+	public function image($url, $alt = null, $attributes = array())
 	{
 		$attributes['alt'] = $alt;
 
-		return '<img src="'.$this->url->asset($url, $secure).'"'.$this->attributes($attributes).'>';
+		return '<img src="'.$this->url->asset($url).'"'.$this->attributes($attributes).'>';
 	}
 
 	/**
@@ -280,8 +293,10 @@ class HtmlBuilder {
 		{
 			return $this->nestedListing($key, $type, $value);
 		}
-
-		return '<li>'.e($value).'</li>';
+		else
+		{
+			return '<li>'.e($value).'</li>';
+		}
 	}
 
 	/**
@@ -298,8 +313,10 @@ class HtmlBuilder {
 		{
 			return $this->listing($type, $value);
 		}
-
-		return '<li>'.$key.$this->listing($type, $value).'</li>';
+		else
+		{
+			return '<li>'.$key.$this->listing($type, $value).'</li>';
+		}
 	}
 
 	/**
@@ -370,6 +387,25 @@ class HtmlBuilder {
 		}
 
 		return $safe;
+	}
+
+	/**
+	 * Dynamically handle calls to the html class.
+	 *
+	 * @param  string  $method
+	 * @param  array   $parameters
+	 * @return mixed
+	 *
+	 * @throws \BadMethodCallException
+	 */
+	public function __call($method, $parameters)
+	{
+		if (isset($this->macros[$method]))
+		{
+			return call_user_func_array($this->macros[$method], $parameters);
+		}
+
+		throw new \BadMethodCallException("Method {$method} does not exist.");
 	}
 
 }

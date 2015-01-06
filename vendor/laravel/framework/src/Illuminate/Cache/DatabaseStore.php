@@ -71,9 +71,7 @@ class DatabaseStore implements StoreInterface {
 
 			if (time() >= $cache->expiration)
 			{
-				$this->forget($key);
-
-				return null;
+				return $this->forget($key);
 			}
 
 			return $this->encrypter->decrypt($cache->value);
@@ -134,7 +132,7 @@ class DatabaseStore implements StoreInterface {
 	 */
 	public function decrement($key, $value = 1)
 	{
-		throw new \LogicException("Decrement operations not supported by this driver.");
+		throw new \LogicException("Increment operations not supported by this driver.");
 	}
 
 	/**

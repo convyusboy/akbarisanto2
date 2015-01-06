@@ -60,7 +60,7 @@ class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testPhpSession53()
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
             $this->markTestSkipped('Test skipped, for PHP 5.3 only.');
         }
 
@@ -84,7 +84,7 @@ class PhpBridgeSessionStorageTest extends \PHPUnit_Framework_TestCase
 
     public function testPhpSession54()
     {
-        if (PHP_VERSION_ID < 50400) {
+        if (version_compare(phpversion(), '5.4.0', '<')) {
             $this->markTestSkipped('Test skipped, for PHP 5.4 only.');
         }
 

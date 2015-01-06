@@ -53,11 +53,12 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
         $result = array();
 
         foreach ($profileList as $item) {
+
             if ($limit === 0) {
                 break;
             }
 
-            if ($item == '') {
+            if ($item=='') {
                 continue;
             }
 
@@ -77,12 +78,12 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
                 continue;
             }
 
-            $result[$itemToken] = array(
-                'token' => $itemToken,
-                'ip' => $itemIp,
+            $result[$itemToken]  = array(
+                'token'  => $itemToken,
+                'ip'     => $itemIp,
                 'method' => $itemMethod,
-                'url' => $itemUrl,
-                'time' => $itemTime,
+                'url'    => $itemUrl,
+                'time'   => $itemTime,
                 'parent' => $itemParent,
             );
             --$limit;
@@ -152,19 +153,20 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
     public function write(Profile $profile)
     {
         $data = array(
-            'token' => $profile->getToken(),
-            'parent' => $profile->getParentToken(),
+            'token'    => $profile->getToken(),
+            'parent'   => $profile->getParentToken(),
             'children' => array_map(function ($p) { return $p->getToken(); }, $profile->getChildren()),
-            'data' => $profile->getCollectors(),
-            'ip' => $profile->getIp(),
-            'method' => $profile->getMethod(),
-            'url' => $profile->getUrl(),
-            'time' => $profile->getTime(),
+            'data'     => $profile->getCollectors(),
+            'ip'       => $profile->getIp(),
+            'method'   => $profile->getMethod(),
+            'url'      => $profile->getUrl(),
+            'time'     => $profile->getTime(),
         );
 
         $profileIndexed = false !== $this->getValue($this->getItemName($profile->getToken()));
 
         if ($this->setValue($this->getItemName($profile->getToken()), $data, $this->lifetime)) {
+
             if (!$profileIndexed) {
                 // Add to index
                 $indexName = $this->getIndexName();
@@ -203,7 +205,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      * @param mixed  $value
      * @param int    $expiration
      *
-     * @return bool
+     * @return boolean
      */
     abstract protected function setValue($key, $value, $expiration = 0);
 
@@ -212,7 +214,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      *
      * @param string $key
      *
-     * @return bool
+     * @return boolean
      */
     abstract protected function delete($key);
 
@@ -222,7 +224,7 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
      * @param string $value
      * @param int    $expiration
      *
-     * @return bool
+     * @return boolean
      */
     abstract protected function appendValue($key, $value, $expiration = 0);
 
@@ -302,4 +304,5 @@ abstract class BaseMemcacheProfilerStorage implements ProfilerStorageInterface
 
         return true;
     }
+
 }

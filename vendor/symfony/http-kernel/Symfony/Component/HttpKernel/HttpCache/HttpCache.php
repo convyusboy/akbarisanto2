@@ -87,13 +87,13 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         register_shutdown_function(array($this->store, 'cleanup'));
 
         $this->options = array_merge(array(
-            'debug' => false,
-            'default_ttl' => 0,
-            'private_headers' => array('Authorization', 'Cookie'),
-            'allow_reload' => false,
-            'allow_revalidate' => false,
+            'debug'                  => false,
+            'default_ttl'            => 0,
+            'private_headers'        => array('Authorization', 'Cookie'),
+            'allow_reload'           => false,
+            'allow_revalidate'       => false,
             'stale_while_revalidate' => 2,
-            'stale_if_error' => 60,
+            'stale_if_error'         => 60,
         ), $options);
     }
 
@@ -151,6 +151,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
     {
         return $this->kernel;
     }
+
 
     /**
      * Gets the Esi instance
@@ -231,7 +232,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Forwards the Request to the backend without storing the Response in the cache.
      *
      * @param Request $request A Request instance
-     * @param bool    $catch   Whether to process exceptions
+     * @param Boolean $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      */
@@ -246,7 +247,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Invalidates non-safe methods (like POST, PUT, and DELETE).
      *
      * @param Request $request A Request instance
-     * @param bool    $catch   Whether to process exceptions
+     * @param Boolean $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      *
@@ -295,7 +296,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * it triggers "miss" processing.
      *
      * @param Request $request A Request instance
-     * @param bool    $catch   whether to process exceptions
+     * @param Boolean $catch   whether to process exceptions
      *
      * @return Response A Response instance
      *
@@ -307,7 +308,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         if ($this->options['allow_reload'] && $request->isNoCache()) {
             $this->record($request, 'reload');
 
-            return $this->fetch($request, $catch);
+            return $this->fetch($request);
         }
 
         try {
@@ -349,7 +350,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param Request  $request A Request instance
      * @param Response $entry   A Response instance to validate
-     * @param bool     $catch   Whether to process exceptions
+     * @param Boolean  $catch   Whether to process exceptions
      *
      * @return Response A Response instance
      */
@@ -410,7 +411,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * This methods is triggered when the cache missed or a reload is required.
      *
      * @param Request $request A Request instance
-     * @param bool    $catch   whether to process exceptions
+     * @param Boolean $catch   whether to process exceptions
      *
      * @return Response A Response instance
      */
@@ -427,6 +428,12 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         $response = $this->forward($subRequest, $catch);
 
+        if ($this->isPrivateRequest($request) && !$response->headers->hasCacheControlDirective('public')) {
+            $response->setPrivate(true);
+        } elseif ($this->options['default_ttl'] > 0 && null === $response->getTtl() && !$response->headers->getCacheControlDirective('must-revalidate')) {
+            $response->setTtl($this->options['default_ttl']);
+        }
+
         if ($response->isCacheable()) {
             $this->store($request, $response);
         }
@@ -438,7 +445,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * Forwards the Request to the backend and returns the Response.
      *
      * @param Request  $request A Request instance
-     * @param bool     $catch   Whether to catch exceptions or not
+     * @param Boolean  $catch   Whether to catch exceptions or not
      * @param Response $entry   A Response instance (the stale entry if present, null otherwise)
      *
      * @return Response A Response instance
@@ -461,12 +468,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
         // is always called from the same process as the backend.
         $request->server->set('REMOTE_ADDR', '127.0.0.1');
 
-        // make sure HttpCache is a trusted proxy
-        if (!in_array('127.0.0.1', $trustedProxies = Request::getTrustedProxies())) {
-            $trustedProxies[] = '127.0.0.1';
-            Request::setTrustedProxies($trustedProxies);
-        }
-
         // always a "master" request (as the real master request can be in cache)
         $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $catch);
         // FIXME: we probably need to also catch exceptions if raw === true
@@ -486,12 +487,6 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
 
         $this->processResponseBody($request, $response);
 
-        if ($this->isPrivateRequest($request) && !$response->headers->hasCacheControlDirective('public')) {
-            $response->setPrivate(true);
-        } elseif ($this->options['default_ttl'] > 0 && null === $response->getTtl() && !$response->headers->getCacheControlDirective('must-revalidate')) {
-            $response->setTtl($this->options['default_ttl']);
-        }
-
         return $response;
     }
 
@@ -501,7 +496,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Request  $request A Request instance
      * @param Response $entry   A Response instance
      *
-     * @return bool true if the cache entry if fresh enough, false otherwise
+     * @return Boolean true if the cache entry if fresh enough, false otherwise
      */
     protected function isFreshEnough(Request $request, Response $entry)
     {
@@ -522,12 +517,12 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      * @param Request  $request A Request instance
      * @param Response $entry   A Response instance
      *
-     * @return bool true if the cache entry can be returned even if it is staled, false otherwise
+     * @return Boolean true if the cache entry can be returned even if it is staled, false otherwise
      */
     protected function lock(Request $request, Response $entry)
     {
         // try to acquire a lock to call the backend
-        $lock = $this->store->lock($request);
+        $lock = $this->store->lock($request, $entry);
 
         // there is already another process calling the backend
         if (true !== $lock) {
@@ -607,6 +602,8 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param Request  $request  A Request instance
      * @param Response $response A Response instance
+     *
+     * @return Response A Response instance
      */
     private function restoreResponseBody(Request $request, Response $response)
     {
@@ -654,7 +651,7 @@ class HttpCache implements HttpKernelInterface, TerminableInterface
      *
      * @param Request $request A Request instance
      *
-     * @return bool true if the Request is private, false otherwise
+     * @return Boolean true if the Request is private, false otherwise
      */
     private function isPrivateRequest(Request $request)
     {

@@ -52,7 +52,7 @@ class SessionHandlerProxyTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($this->proxy->isActive());
         $this->proxy->open('name', 'id');
-        if (PHP_VERSION_ID < 50400) {
+        if (version_compare(phpversion(), '5.4.0', '<')) {
             $this->assertTrue($this->proxy->isActive());
         } else {
             $this->assertFalse($this->proxy->isActive());

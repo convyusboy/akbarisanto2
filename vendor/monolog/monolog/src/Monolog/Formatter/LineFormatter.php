@@ -11,8 +11,6 @@
 
 namespace Monolog\Formatter;
 
-use Exception;
-
 /**
  * Formats incoming records into a one-line string
  *
@@ -26,40 +24,15 @@ class LineFormatter extends NormalizerFormatter
     const SIMPLE_FORMAT = "[%datetime%] %channel%.%level_name%: %message% %context% %extra%\n";
 
     protected $format;
-    protected $allowInlineLineBreaks;
-    protected $ignoreEmptyContextAndExtra;
-    protected $includeStacktraces;
 
     /**
-     * @param string $format                     The format of the message
-     * @param string $dateFormat                 The format of the timestamp: one supported by DateTime::format
-     * @param bool   $allowInlineLineBreaks      Whether to allow inline line breaks in log entries
-     * @param bool   $ignoreEmptyContextAndExtra
+     * @param string $format     The format of the message
+     * @param string $dateFormat The format of the timestamp: one supported by DateTime::format
      */
-    public function __construct($format = null, $dateFormat = null, $allowInlineLineBreaks = false, $ignoreEmptyContextAndExtra = false)
+    public function __construct($format = null, $dateFormat = null)
     {
         $this->format = $format ?: static::SIMPLE_FORMAT;
-        $this->allowInlineLineBreaks = $allowInlineLineBreaks;
-        $this->ignoreEmptyContextAndExtra = $ignoreEmptyContextAndExtra;
         parent::__construct($dateFormat);
-    }
-
-    public function includeStacktraces($include = true)
-    {
-        $this->includeStacktraces = $include;
-        if ($this->includeStacktraces) {
-            $this->allowInlineLineBreaks = true;
-        }
-    }
-
-    public function allowInlineLineBreaks($allow = true)
-    {
-        $this->allowInlineLineBreaks = $allow;
-    }
-
-    public function ignoreEmptyContextAndExtra($ignore = true)
-    {
-        $this->ignoreEmptyContextAndExtra = $ignore;
     }
 
     /**
@@ -70,29 +43,15 @@ class LineFormatter extends NormalizerFormatter
         $vars = parent::format($record);
 
         $output = $this->format;
-
         foreach ($vars['extra'] as $var => $val) {
             if (false !== strpos($output, '%extra.'.$var.'%')) {
-                $output = str_replace('%extra.'.$var.'%', $this->stringify($val), $output);
+                $output = str_replace('%extra.'.$var.'%', $this->convertToString($val), $output);
                 unset($vars['extra'][$var]);
             }
         }
-
-        if ($this->ignoreEmptyContextAndExtra) {
-            if (empty($vars['context'])) {
-                unset($vars['context']);
-                $output = str_replace('%context%', '', $output);
-            }
-
-            if (empty($vars['extra'])) {
-                unset($vars['extra']);
-                $output = str_replace('%extra%', '', $output);
-            }
-        }
-
         foreach ($vars as $var => $val) {
             if (false !== strpos($output, '%'.$var.'%')) {
-                $output = str_replace('%'.$var.'%', $this->stringify($val), $output);
+                $output = str_replace('%'.$var.'%', $this->convertToString($val), $output);
             }
         }
 
@@ -109,51 +68,37 @@ class LineFormatter extends NormalizerFormatter
         return $message;
     }
 
-    public function stringify($value)
+    protected function normalize($data)
     {
-        return $this->replaceNewlines($this->convertToString($value));
-    }
-
-    protected function normalizeException(Exception $e)
-    {
-        $previousText = '';
-        if ($previous = $e->getPrevious()) {
-            do {
-                $previousText .= ', '.get_class($previous).'(code: '.$previous->getCode().'): '.$previous->getMessage().' at '.$previous->getFile().':'.$previous->getLine();
-            } while ($previous = $previous->getPrevious());
+        if (is_bool($data) || is_null($data)) {
+            return var_export($data, true);
         }
 
-        $str = '[object] ('.get_class($e).'(code: '.$e->getCode().'): '.$e->getMessage().' at '.$e->getFile().':'.$e->getLine().$previousText.')';
-        if ($this->includeStacktraces) {
-            $str .= "\n[stacktrace]\n".$e->getTraceAsString();
+        if ($data instanceof \Exception) {
+            $previousText = '';
+            if ($previous = $data->getPrevious()) {
+                do {
+                    $previousText .= ', '.get_class($previous).': '.$previous->getMessage().' at '.$previous->getFile().':'.$previous->getLine();
+                } while ($previous = $previous->getPrevious());
+            }
+
+            return '[object] ('.get_class($data).': '.$data->getMessage().' at '.$data->getFile().':'.$data->getLine().$previousText.')';
         }
 
-        return $str;
+        return parent::normalize($data);
     }
 
     protected function convertToString($data)
     {
-        if (null === $data || is_bool($data)) {
-            return var_export($data, true);
-        }
-
-        if (is_scalar($data)) {
+        if (null === $data || is_scalar($data)) {
             return (string) $data;
         }
 
+        $data = $this->normalize($data);
         if (version_compare(PHP_VERSION, '5.4.0', '>=')) {
             return $this->toJson($data, true);
         }
 
         return str_replace('\\/', '/', @json_encode($data));
-    }
-
-    protected function replaceNewlines($str)
-    {
-        if ($this->allowInlineLineBreaks) {
-            return $str;
-        }
-
-        return strtr($str, array("\r\n" => ' ', "\r" => ' ', "\n" => ' '));
     }
 }

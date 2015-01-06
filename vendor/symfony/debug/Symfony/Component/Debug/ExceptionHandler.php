@@ -13,7 +13,10 @@ namespace Symfony\Component\Debug;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Debug\Exception\FlattenException;
-use Symfony\Component\Debug\Exception\OutOfMemoryException;
+
+if (!defined('ENT_SUBSTITUTE')) {
+    define('ENT_SUBSTITUTE', 8);
+}
 
 /**
  * ExceptionHandler converts an exception to a Response object.
@@ -25,15 +28,11 @@ use Symfony\Component\Debug\Exception\OutOfMemoryException;
  * available, the Response content is always HTML.
  *
  * @author Fabien Potencier <fabien@symfony.com>
- * @author Nicolas Grekas <p@tchwork.com>
  */
 class ExceptionHandler
 {
     private $debug;
     private $charset;
-    private $handler;
-    private $caughtBuffer;
-    private $caughtLength;
 
     public function __construct($debug = true, $charset = 'UTF-8')
     {
@@ -44,7 +43,7 @@ class ExceptionHandler
     /**
      * Registers the exception handler.
      *
-     * @param bool $debug
+     * @param Boolean $debug
      *
      * @return ExceptionHandler The registered exception handler
      */
@@ -58,80 +57,21 @@ class ExceptionHandler
     }
 
     /**
-     * Sets a user exception handler.
-     *
-     * @param callable $handler An handler that will be called on Exception
-     *
-     * @return callable|null The previous exception handler if any
-     */
-    public function setHandler($handler)
-    {
-        if (null !== $handler && !is_callable($handler)) {
-            throw new \LogicException('The exception handler must be a valid PHP callable.');
-        }
-        $old = $this->handler;
-        $this->handler = $handler;
-
-        return $old;
-    }
-
-    /**
-     * Sends a response for the given Exception.
-     *
-     * To be as fail-safe as possible, the exception is first handled
-     * by our simple exception handler, then by the user exception handler.
-     * The latter takes precedence and any output from the former is cancelled,
-     * if and only if nothing bad happens in this handling path.
-     */
-    public function handle(\Exception $exception)
-    {
-        if (null === $this->handler || $exception instanceof OutOfMemoryException) {
-            $this->failSafeHandle($exception);
-
-            return;
-        }
-
-        $caughtLength = $this->caughtLength = 0;
-
-        ob_start(array($this, 'catchOutput'));
-        $this->failSafeHandle($exception);
-        while (null === $this->caughtBuffer && ob_end_flush()) {
-            // Empty loop, everything is in the condition
-        }
-        if (isset($this->caughtBuffer[0])) {
-            ob_start(array($this, 'cleanOutput'));
-            echo $this->caughtBuffer;
-            $caughtLength = ob_get_length();
-        }
-        $this->caughtBuffer = null;
-
-        try {
-            call_user_func($this->handler, $exception);
-            $this->caughtLength = $caughtLength;
-        } catch (\Exception $e) {
-            if (!$caughtLength) {
-                // All handlers failed. Let PHP handle that now.
-                throw $exception;
-            }
-        }
-    }
-
-    /**
      * Sends a response for the given Exception.
      *
      * If you have the Symfony HttpFoundation component installed,
      * this method will use it to create and send the response. If not,
      * it will fallback to plain PHP functions.
      *
+     * @param \Exception $exception An \Exception instance
+     *
      * @see sendPhpResponse
      * @see createResponse
      */
-    private function failSafeHandle(\Exception $exception)
+    public function handle(\Exception $exception)
     {
-        if (class_exists('Symfony\Component\HttpFoundation\Response', false)) {
-            $response = $this->createResponse($exception);
-            $response->sendHeaders();
-            $response->sendContent();
+        if (class_exists('Symfony\Component\HttpFoundation\Response')) {
+            $this->createResponse($exception)->send();
         } else {
             $this->sendPhpResponse($exception);
         }
@@ -151,11 +91,9 @@ class ExceptionHandler
             $exception = FlattenException::create($exception);
         }
 
-        if (!headers_sent()) {
-            header(sprintf('HTTP/1.0 %s', $exception->getStatusCode()));
-            foreach ($exception->getHeaders() as $name => $value) {
-                header($name.': '.$value, false);
-            }
+        header(sprintf('HTTP/1.0 %s', $exception->getStatusCode()));
+        foreach ($exception->getHeaders() as $name => $value) {
+            header($name.': '.$value, false);
         }
 
         echo $this->decorate($this->getContent($exception), $this->getStylesheet($exception));
@@ -233,7 +171,7 @@ EOF
             } catch (\Exception $e) {
                 // something nasty happened and we cannot throw an exception anymore
                 if ($this->debug) {
-                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($e), $e->getMessage());
+                    $title = sprintf('Exception thrown when handling an exception (%s: %s)', get_class($exception), $exception->getMessage());
                 } else {
                     $title = 'Whoops, looks like something went wrong.';
                 }
@@ -317,7 +255,7 @@ EOF;
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta name="robots" content="noindex,nofollow" />
         <style>
             /* Copyright (c) 2010, Yahoo! Inc. All rights reserved. Code licensed under the BSD License: http://developer.yahoo.com/yui/license.html */
@@ -352,19 +290,14 @@ EOF;
      */
     private function formatArgs(array $args)
     {
-        if (PHP_VERSION_ID >= 50400) {
-            $flags = ENT_QUOTES | ENT_SUBSTITUTE;
-        } else {
-            $flags = ENT_QUOTES;
-        }
         $result = array();
         foreach ($args as $key => $item) {
             if ('object' === $item[0]) {
                 $formattedValue = sprintf("<em>object</em>(%s)", $this->abbrClass($item[1]));
             } elseif ('array' === $item[0]) {
                 $formattedValue = sprintf("<em>array</em>(%s)", is_array($item[1]) ? $this->formatArgs($item[1]) : $item[1]);
-            } elseif ('string' === $item[0]) {
-                $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], $flags, $this->charset));
+            } elseif ('string'  === $item[0]) {
+                $formattedValue = sprintf("'%s'", htmlspecialchars($item[1], ENT_QUOTES | ENT_SUBSTITUTE, $this->charset));
             } elseif ('null' === $item[0]) {
                 $formattedValue = '<em>null</em>';
             } elseif ('boolean' === $item[0]) {
@@ -372,38 +305,12 @@ EOF;
             } elseif ('resource' === $item[0]) {
                 $formattedValue = '<em>resource</em>';
             } else {
-                $formattedValue = str_replace("\n", '', var_export(htmlspecialchars((string) $item[1], $flags, $this->charset), true));
+                $formattedValue = str_replace("\n", '', var_export(htmlspecialchars((string) $item[1], ENT_QUOTES | ENT_SUBSTITUTE, $this->charset), true));
             }
 
             $result[] = is_int($key) ? $formattedValue : sprintf("'%s' => %s", $key, $formattedValue);
         }
 
         return implode(', ', $result);
-    }
-
-    /**
-     * @internal
-     */
-    public function catchOutput($buffer)
-    {
-        $this->caughtBuffer = $buffer;
-
-        return '';
-    }
-
-    /**
-     * @internal
-     */
-    public function cleanOutput($buffer)
-    {
-        if ($this->caughtLength) {
-            // use substr_replace() instead of substr() for mbstring overloading resistance
-            $cleanBuffer = substr_replace($buffer, '', 0, $this->caughtLength);
-            if (isset($cleanBuffer[0])) {
-                $buffer = $cleanBuffer;
-            }
-        }
-
-        return $buffer;
     }
 }

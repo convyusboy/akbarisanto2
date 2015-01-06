@@ -1,24 +1,25 @@
 <?php
+/* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4: */
 
 /**
  * Pure-PHP implementations of keyed-hash message authentication codes (HMACs) and various cryptographic hashing functions.
  *
  * Uses hash() or mhash() if available and an internal implementation, otherwise.  Currently supports the following:
  *
- * md2, md5, md5-96, sha1, sha1-96, sha256, sha256-96, sha384, and sha512, sha512-96
+ * md2, md5, md5-96, sha1, sha1-96, sha256, sha384, and sha512
  *
  * If {@link Crypt_Hash::setKey() setKey()} is called, {@link Crypt_Hash::hash() hash()} will return the HMAC as opposed to
  * the hash.  If no valid algorithm is provided, sha1 will be used.
  *
  * PHP versions 4 and 5
  *
- * {@internal The variable names are the same as those in
+ * {@internal The variable names are the same as those in 
  * {@link http://tools.ietf.org/html/rfc2104#section-2 RFC2104}.}}
  *
  * Here's a short example of how to use this library:
  * <code>
  * <?php
- *    include 'Crypt/Hash.php';
+ *    include('Crypt/Hash.php');
  *
  *    $hash = new Crypt_Hash('sha1');
  *
@@ -34,10 +35,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- *
+ * 
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *
+ * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -46,12 +47,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @category  Crypt
- * @package   Crypt_Hash
- * @author    Jim Wigginton <terrafrost@php.net>
- * @copyright MMVII Jim Wigginton
- * @license   http://www.opensource.org/licenses/mit-license.html  MIT License
- * @link      http://phpseclib.sourceforge.net
+ * @category   Crypt
+ * @package    Crypt_Hash
+ * @author     Jim Wigginton <terrafrost@php.net>
+ * @copyright  MMVII Jim Wigginton
+ * @license    http://www.opensource.org/licenses/mit-license.html  MIT License
+ * @link       http://phpseclib.sourceforge.net
  */
 
 /**#@+
@@ -75,21 +76,12 @@ define('CRYPT_HASH_MODE_HASH',     3);
 /**
  * Pure-PHP implementations of keyed-hash message authentication codes (HMACs) and various cryptographic hashing functions.
  *
- * @package Crypt_Hash
  * @author  Jim Wigginton <terrafrost@php.net>
+ * @version 0.1.0
  * @access  public
+ * @package Crypt_Hash
  */
-class Crypt_Hash
-{
-    /**
-     * Hash Parameter
-     *
-     * @see Crypt_Hash::setHash()
-     * @var Integer
-     * @access private
-     */
-    var $hashParam;
-
+class Crypt_Hash {
     /**
      * Byte-length of compression blocks / key (Internal HMAC)
      *
@@ -183,19 +175,6 @@ class Crypt_Hash
     }
 
     /**
-     * Gets the hash function.
-     *
-     * As set by the constructor or by the setHash() method.
-     *
-     * @access public
-     * @return String
-     */
-    function getHash()
-    {
-        return $this->hashParam;
-    }
-
-    /**
      * Sets the hash function.
      *
      * @access public
@@ -203,13 +182,10 @@ class Crypt_Hash
      */
     function setHash($hash)
     {
-        $this->hashParam = $hash = strtolower($hash);
+        $hash = strtolower($hash);
         switch ($hash) {
             case 'md5-96':
             case 'sha1-96':
-            case 'sha256-96':
-            case 'sha512-96':
-                $hash = substr($hash, 0, -3);
                 $this->l = 12; // 96 / 8 = 12
                 break;
             case 'md2':
@@ -246,12 +222,14 @@ class Crypt_Hash
             case CRYPT_HASH_MODE_MHASH:
                 switch ($hash) {
                     case 'md5':
+                    case 'md5-96':
                         $this->hash = MHASH_MD5;
                         break;
                     case 'sha256':
                         $this->hash = MHASH_SHA256;
                         break;
                     case 'sha1':
+                    case 'sha1-96':
                     default:
                         $this->hash = MHASH_SHA1;
                 }
@@ -259,6 +237,7 @@ class Crypt_Hash
             case CRYPT_HASH_MODE_HASH:
                 switch ($hash) {
                     case 'md5':
+                    case 'md5-96':
                         $this->hash = 'md5';
                         return;
                     case 'md2':
@@ -268,6 +247,7 @@ class Crypt_Hash
                         $this->hash = $hash;
                         return;
                     case 'sha1':
+                    case 'sha1-96':
                     default:
                         $this->hash = 'sha1';
                 }
@@ -280,6 +260,7 @@ class Crypt_Hash
                  $this->hash = array($this, '_md2');
                  break;
             case 'md5':
+            case 'md5-96':
                  $this->b = 64;
                  $this->hash = array($this, '_md5');
                  break;
@@ -293,6 +274,7 @@ class Crypt_Hash
                  $this->hash = array($this, '_sha512');
                  break;
             case 'sha1':
+            case 'sha1-96':
             default:
                  $this->b = 64;
                  $this->hash = array($this, '_sha1');
@@ -577,7 +559,7 @@ class Crypt_Hash
     function _sha512($m)
     {
         if (!class_exists('Math_BigInteger')) {
-            include_once 'Math/BigInteger.php';
+            require_once('Math/BigInteger.php');
         }
 
         static $init384, $init512, $k;
@@ -585,11 +567,11 @@ class Crypt_Hash
         if (!isset($k)) {
             // Initialize variables
             $init384 = array( // initial values for SHA384
-                'cbbb9d5dc1059ed8', '629a292a367cd507', '9159015a3070dd17', '152fecd8f70e5939',
+                'cbbb9d5dc1059ed8', '629a292a367cd507', '9159015a3070dd17', '152fecd8f70e5939', 
                 '67332667ffc00b31', '8eb44a8768581511', 'db0c2e0d64f98fa7', '47b5481dbefa4fa4'
             );
             $init512 = array( // initial values for SHA512
-                '6a09e667f3bcc908', 'bb67ae8584caa73b', '3c6ef372fe94f82b', 'a54ff53a5f1d36f1',
+                '6a09e667f3bcc908', 'bb67ae8584caa73b', '3c6ef372fe94f82b', 'a54ff53a5f1d36f1', 
                 '510e527fade682d1', '9b05688c2b3e6c1f', '1f83d9abfb41bd6b', '5be0cd19137e2179'
             );
 

@@ -21,12 +21,12 @@ abstract class AbstractProxy
     /**
      * Flag if handler wraps an internal PHP session handler (using \SessionHandler).
      *
-     * @var bool
+     * @var boolean
      */
     protected $wrapper = false;
 
     /**
-     * @var bool
+     * @var boolean
      */
     protected $active = false;
 
@@ -48,7 +48,7 @@ abstract class AbstractProxy
     /**
      * Is this proxy handler and instance of \SessionHandlerInterface.
      *
-     * @return bool
+     * @return boolean
      */
     public function isSessionHandlerInterface()
     {
@@ -58,7 +58,7 @@ abstract class AbstractProxy
     /**
      * Returns true if this handler wraps an internal PHP session save handler using \SessionHandler.
      *
-     * @return bool
+     * @return Boolean
      */
     public function isWrapper()
     {
@@ -68,11 +68,11 @@ abstract class AbstractProxy
     /**
      * Has a session started?
      *
-     * @return bool
+     * @return Boolean
      */
     public function isActive()
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
             return $this->active = \PHP_SESSION_ACTIVE === session_status();
         }
 
@@ -87,13 +87,13 @@ abstract class AbstractProxy
      *
      * @internal
      *
-     * @param bool $flag
+     * @param Boolean $flag
      *
      * @throws \LogicException
      */
     public function setActive($flag)
     {
-        if (PHP_VERSION_ID >= 50400) {
+        if (version_compare(phpversion(), '5.4.0', '>=')) {
             throw new \LogicException('This method is disabled in PHP 5.4.0+');
         }
 

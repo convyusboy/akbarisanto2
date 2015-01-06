@@ -81,7 +81,6 @@ class Factory {
 	 * @param  array  $data
 	 * @param  array  $rules
 	 * @param  array  $messages
-	 * @param  array  $customAttributes
 	 * @return \Illuminate\Validation\Validator
 	 */
 	public function make(array $data, array $rules, array $messages = array(), array $customAttributes = array())
@@ -115,7 +114,7 @@ class Factory {
 	 * @param  \Illuminate\Validation\Validator  $validator
 	 * @return void
 	 */
-	protected function addExtensions(Validator $validator)
+	protected function addExtensions($validator)
 	{
 		$validator->addExtensions($this->extensions);
 
@@ -137,17 +136,18 @@ class Factory {
 	 * @param  array  $data
 	 * @param  array  $rules
 	 * @param  array  $messages
-	 * @param  array  $customAttributes
 	 * @return \Illuminate\Validation\Validator
 	 */
-	protected function resolve(array $data, array $rules, array $messages, array $customAttributes)
+	protected function resolve($data, $rules, $messages, $customAttributes)
 	{
 		if (is_null($this->resolver))
 		{
 			return new Validator($this->translator, $data, $rules, $messages, $customAttributes);
 		}
-
-		return call_user_func($this->resolver, $this->translator, $data, $rules, $messages, $customAttributes);
+		else
+		{
+			return call_user_func($this->resolver, $this->translator, $data, $rules, $messages, $customAttributes);
+		}
 	}
 
 	/**
@@ -195,7 +195,7 @@ class Factory {
 	/**
 	 * Set the Validator instance resolver.
 	 *
-	 * @param  \Closure  $resolver
+	 * @param  Closure  $resolver
 	 * @return void
 	 */
 	public function resolver(Closure $resolver)

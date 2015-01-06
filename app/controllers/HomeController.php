@@ -17,6 +17,8 @@ class HomeController extends BaseController {
 
 	public function getHome()
 	{
+		// $consumer_key = 'Etkk7hgob55TMDhK6f6dZuQkJoJ8HL5uj4kqwrPvmWJ8lof5v8';
+		// $secret_key = 'mo6hLpAaVElUmeXPcwuhQfo00rtgObLuNNJkewy0BmRAq7yACS';
 		// for portfolio
 		$portfolios = array();
 		$api_key = 'Etkk7hgob55TMDhK6f6dZuQkJoJ8HL5uj4kqwrPvmWJ8lof5v8';

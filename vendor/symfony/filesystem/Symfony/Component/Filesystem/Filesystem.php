@@ -28,9 +28,9 @@ class Filesystem
      *
      * By default, if the target already exists, it is not overridden.
      *
-     * @param string $originFile The original filename
-     * @param string $targetFile The target filename
-     * @param bool   $override   Whether to override an existing file or not
+     * @param string  $originFile The original filename
+     * @param string  $targetFile The target filename
+     * @param boolean $override   Whether to override an existing file or not
      *
      * @throws FileNotFoundException    When originFile doesn't exist
      * @throws IOException              When copy fails
@@ -51,26 +51,15 @@ class Filesystem
 
         if ($doCopy) {
             // https://bugs.php.net/bug.php?id=64634
-            if (false === $source = @fopen($originFile, 'r')) {
-                throw new IOException(sprintf('Failed to copy "%s" to "%s" because source file could not be opened for reading.', $originFile, $targetFile), 0, null, $originFile);
-            }
-
-            // Stream context created to allow files overwrite when using FTP stream wrapper - disabled by default
-            if (false === $target = @fopen($targetFile, 'w', null, stream_context_create(array('ftp' => array('overwrite' => true))))) {
-                throw new IOException(sprintf('Failed to copy "%s" to "%s" because target file could not be opened for writing.', $originFile, $targetFile), 0, null, $originFile);
-            }
-
-            $bytesCopied = stream_copy_to_stream($source, $target);
+            $source = fopen($originFile, 'r');
+            $target = fopen($targetFile, 'w');
+            stream_copy_to_stream($source, $target);
             fclose($source);
             fclose($target);
             unset($source, $target);
 
             if (!is_file($targetFile)) {
                 throw new IOException(sprintf('Failed to copy "%s" to "%s".', $originFile, $targetFile), 0, null, $originFile);
-            }
-
-            if (stream_is_local($originFile) && $bytesCopied !== filesize($originFile)) {
-                throw new IOException(sprintf('Failed to copy the whole content of "%s" to "%s %g bytes copied".', $originFile, $targetFile, $bytesCopied), 0, null, $originFile);
             }
         }
     }
@@ -79,7 +68,7 @@ class Filesystem
      * Creates a directory recursively.
      *
      * @param string|array|\Traversable $dirs The directory path
-     * @param int                       $mode The directory mode
+     * @param integer                   $mode The directory mode
      *
      * @throws IOException On any directory creation failure
      */
@@ -91,14 +80,7 @@ class Filesystem
             }
 
             if (true !== @mkdir($dir, $mode, true)) {
-                $error = error_get_last();
-                if (!is_dir($dir)) {
-                    // The directory was not created by a concurrent process. Let's throw an exception with a developer friendly error message if we have one
-                    if ($error) {
-                        throw new IOException(sprintf('Failed to create "%s": %s.', $dir, $error['message']), 0, null, $dir);
-                    }
-                    throw new IOException(sprintf('Failed to create "%s"', $dir), 0, null, $dir);
-                }
+                throw new IOException(sprintf('Failed to create "%s".', $dir), 0, null, $dir);
             }
         }
     }
@@ -108,7 +90,7 @@ class Filesystem
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to check
      *
-     * @return bool true if the file exists, false otherwise
+     * @return Boolean true if the file exists, false otherwise
      */
     public function exists($files)
     {
@@ -125,8 +107,8 @@ class Filesystem
      * Sets access and modification time of file.
      *
      * @param string|array|\Traversable $files A filename, an array of files, or a \Traversable instance to create
-     * @param int                       $time  The touch time as a Unix timestamp
-     * @param int                       $atime The access time as a Unix timestamp
+     * @param integer                   $time  The touch time as a Unix timestamp
+     * @param integer                   $atime The access time as a Unix timestamp
      *
      * @throws IOException When touch fails
      */
@@ -181,9 +163,9 @@ class Filesystem
      * Change mode for an array of files or directories.
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change mode
-     * @param int                       $mode      The new mode (octal)
-     * @param int                       $umask     The mode mask (octal)
-     * @param bool                      $recursive Whether change the mod recursively or not
+     * @param integer                   $mode      The new mode (octal)
+     * @param integer                   $umask     The mode mask (octal)
+     * @param Boolean                   $recursive Whether change the mod recursively or not
      *
      * @throws IOException When the change fail
      */
@@ -204,7 +186,7 @@ class Filesystem
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change owner
      * @param string                    $user      The new owner user name
-     * @param bool                      $recursive Whether change the owner recursively or not
+     * @param Boolean                   $recursive Whether change the owner recursively or not
      *
      * @throws IOException When the change fail
      */
@@ -231,7 +213,7 @@ class Filesystem
      *
      * @param string|array|\Traversable $files     A filename, an array of files, or a \Traversable instance to change group
      * @param string                    $group     The group name
-     * @param bool                      $recursive Whether change the group recursively or not
+     * @param Boolean                   $recursive Whether change the group recursively or not
      *
      * @throws IOException When the change fail
      */
@@ -256,9 +238,9 @@ class Filesystem
     /**
      * Renames a file or a directory.
      *
-     * @param string $origin    The origin filename or directory
-     * @param string $target    The new filename or directory
-     * @param bool   $overwrite Whether to overwrite the target if it already exists
+     * @param string  $origin    The origin filename or directory
+     * @param string  $target    The new filename or directory
+     * @param Boolean $overwrite Whether to overwrite the target if it already exists
      *
      * @throws IOException When target file or directory already exists
      * @throws IOException When origin cannot be renamed
@@ -278,18 +260,17 @@ class Filesystem
     /**
      * Creates a symbolic link or copy a directory.
      *
-     * @param string $originDir     The origin directory path
-     * @param string $targetDir     The symbolic link name
-     * @param bool   $copyOnWindows Whether to copy files if on Windows
+     * @param string  $originDir     The origin directory path
+     * @param string  $targetDir     The symbolic link name
+     * @param Boolean $copyOnWindows Whether to copy files if on Windows
      *
      * @throws IOException When symlink fails
      */
     public function symlink($originDir, $targetDir, $copyOnWindows = false)
     {
-        $onWindows = strtoupper(substr(php_uname('s'), 0, 3)) === 'WIN';
-
-        if ($onWindows && $copyOnWindows) {
+        if (!function_exists('symlink') && $copyOnWindows) {
             $this->mirror($originDir, $targetDir);
+
             return;
         }
 
@@ -312,11 +293,8 @@ class Filesystem
                         throw new IOException('Unable to create symlink due to error code 1314: \'A required privilege is not held by the client\'. Do you have the required Administrator-rights?');
                     }
                 }
-                throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
-            }
 
-            if (!file_exists($targetDir)) {
-                throw new IOException(sprintf('Symbolic link "%s" is created but appears to be broken.', $targetDir), 0, null, $targetDir);
+                throw new IOException(sprintf('Failed to create symbolic link from "%s" to "%s".', $originDir, $targetDir), 0, null, $targetDir);
             }
         }
     }
@@ -368,10 +346,10 @@ class Filesystem
      * @param string       $targetDir The target directory
      * @param \Traversable $iterator  A Traversable instance
      * @param array        $options   An array of boolean options
-     *                                Valid options are:
-     *                                - $options['override'] Whether to override an existing file on copy or not (see copy())
-     *                                - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
-     *                                - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
+     *                               Valid options are:
+     *                                 - $options['override'] Whether to override an existing file on copy or not (see copy())
+     *                                 - $options['copy_on_windows'] Whether to copy files instead of links on Windows (see symlink())
+     *                                 - $options['delete'] Whether to delete files that are not in the source directory (defaults to false)
      *
      * @throws IOException When file type is unknown
      */
@@ -396,17 +374,13 @@ class Filesystem
         }
 
         $copyOnWindows = false;
-        if (isset($options['copy_on_windows'])) {
+        if (isset($options['copy_on_windows']) && !function_exists('symlink')) {
             $copyOnWindows = $options['copy_on_windows'];
         }
 
         if (null === $iterator) {
             $flags = $copyOnWindows ? \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS : \FilesystemIterator::SKIP_DOTS;
             $iterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($originDir, $flags), \RecursiveIteratorIterator::SELF_FIRST);
-        }
-
-        if ($this->exists($originDir)) {
-            $this->mkdir($targetDir);
         }
 
         foreach ($iterator as $file) {
@@ -439,7 +413,7 @@ class Filesystem
      *
      * @param string $file A file path
      *
-     * @return bool
+     * @return Boolean
      */
     public function isAbsolutePath($file)
     {
@@ -459,12 +433,10 @@ class Filesystem
     /**
      * Atomically dumps content into a file.
      *
-     * @param string   $filename The file to be written to.
-     * @param string   $content  The data to write into the file.
-     * @param null|int $mode     The file mode (octal). If null, file permissions are not modified
-     *                           Deprecated since version 2.3.12, to be removed in 3.0.
-     *
-     * @throws IOException If the file cannot be written to.
+     * @param  string  $filename The file to be written to.
+     * @param  string  $content  The data to write into the file.
+     * @param  integer $mode     The file mode (octal).
+     * @throws IOException       If the file cannot be written to.
      */
     public function dumpFile($filename, $content, $mode = 0666)
     {
@@ -483,9 +455,7 @@ class Filesystem
         }
 
         $this->rename($tmpFile, $filename, true);
-        if (null !== $mode) {
-            $this->chmod($filename, $mode);
-        }
+        $this->chmod($filename, $mode);
     }
 
     /**
