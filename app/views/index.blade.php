@@ -53,7 +53,7 @@
 				<div class="intro-text">
 					<span class="name">Ridho Akbarisanto</span>
 					<hr class="star-light">
-					<span class="skills">Web Developer - Graphic Artist - User Experience Designer</span>
+					<span class="skills">@lang('messages.skills')</span>
 				</div>
 			</div>
 		</div>
@@ -129,10 +129,10 @@
 		</div>
 		<div class="row">
 			<div class="col-lg-4 col-lg-offset-2">
-				<p>My name is Ridho Akbarisanto. I'm a developer and programmer. I'm still learning to develop everything in my own way.</p>
+				<p>@lang('messages.about1')</p>
 			</div>
 			<div class="col-lg-4">
-				<p>I'm also a musician and a sportman. I play a lot of sports, like futsal, tennis, volleyball, etc. And I play a lot of music instruments, such as keyboard, guitar, and viola.</p>
+				<p>@lang('messages.about2')</p>
 			</div>
 		</div>
 	</div>
@@ -198,7 +198,8 @@
 			<div class="row">
 				<div class="footer-col col-md-4">
 					<h3>Location</h3>
-					<p>Cigadung Raya Timur 54<br>Bandung, Indonesia<br><br>Wiroto 6<br>Malang, Indonesia, 65121</p>
+					<p>@lang('messages.address1')<br>
+						@lang('messages.address2')</p>
 				</div>
 				<div class="footer-col col-md-4">
 					<h3>Online Accounts</h3>

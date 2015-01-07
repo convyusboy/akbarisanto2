@@ -6,7 +6,7 @@
 	<div class="menu-wrap">
 		<nav class="menu">
 			<div class="icon-list">
-				<a href="#"><i class="nav fa fa-fw fa-star-o"></i><span>Home</span></a>
+				<a href="#page-top"><i class="nav fa fa-fw fa-star-o"></i><span>Home</span></a>
 				<a href="#portfolio"><i class="nav fa fa-fw fa-bell-o"></i><span>Portfolio</span></a>
 				<a href="#blog"><i class="nav fa fa-fw fa-envelope-o"></i><span>Blog</span></a>
 				<a href="#about"><i class="nav fa fa-fw fa-comment-o"></i><span>About</span></a>
@@ -31,7 +31,7 @@
 							<div class="intro-text">
 								<span class="name">Ridho Akbarisanto</span>
 								<hr class="star-light">
-								<span class="skills">Web Developer - Graphic Artist - User Experience Designer</span>
+								<span class="skills">@lang('messages.skills')</span>
 							</div>
 						</div>
 					</div>
@@ -107,10 +107,10 @@
 					</div>
 					<div class="row">
 						<div class="col-lg-4 col-lg-offset-2">
-							<p>My name is Ridho Akbarisanto. I'm a developer and programmer. I'm still learning to develop everything in my own way.</p>
+							<p>@lang('messages.about1')</p>
 						</div>
 						<div class="col-lg-4">
-							<p>I'm also a musician and a sportman. I play a lot of sports, like futsal, tennis, volleyball, etc. And I play a lot of music instruments, such as keyboard, guitar, and viola.</p>
+							<p>@lang('messages.about2')</p>
 						</div>
 					</div>
 				</div>
@@ -176,7 +176,8 @@
 						<div class="row">
 							<div class="footer-col col-md-4">
 								<h3>Location</h3>
-								<p>Cigadung Raya Timur 54<br>Bandung, Indonesia<br><br>Wiroto 6<br>Malang, Indonesia, 65121</p>
+								<p>@lang('messages.address1')<br>
+									@lang('messages.address2')</p>
 							</div>
 							<div class="footer-col col-md-4">
 								<h3>Online Accounts</h3>
@@ -218,7 +219,7 @@
 
 			<!-- Scroll to Top Button (Only visible on small and extra-small screen sizes) -->
 			<div class="scroll-top page-scroll visible-xs visble-sm">
-				<a class="btn btn-primary" href="#page-top">
+				<a class="btn btn-primary" href="#portfolio">
 					<i class="fa fa-chevron-up"></i>
 				</a>
 			</div>
