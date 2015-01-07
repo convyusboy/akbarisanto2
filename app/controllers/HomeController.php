@@ -17,71 +17,42 @@ class HomeController extends BaseController {
 
 	public function getHome()
 	{
-		// $consumer_key = 'Etkk7hgob55TMDhK6f6dZuQkJoJ8HL5uj4kqwrPvmWJ8lof5v8';
-		// $secret_key = 'mo6hLpAaVElUmeXPcwuhQfo00rtgObLuNNJkewy0BmRAq7yACS';
-		// for portfolio
-		$portfolios = array();
-		$api_key = 'Etkk7hgob55TMDhK6f6dZuQkJoJ8HL5uj4kqwrPvmWJ8lof5v8';
-		$tag = 'portfolio';
-		$url = 'api.tumblr.com/v2/blog/akbarisanto.tumblr.com/posts?api_key='.$api_key.'&tag='.$tag;
-		$curl = curl_init($url);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-		$posts_res = curl_exec($curl);
-		curl_close($curl);
-		$posts_resj = json_decode($posts_res,true);
-		$posts = $posts_resj['response']['posts'];
+		$portfolios = $this->getTumblrPost('portfolio');
+		$blogs = $this->getTumblrPost('blog');
 
-		foreach ($posts as $post) {
-			$portfolio = [
-			'id' => $post['id'],
-			'title' => $post['slug'],
-			'content' => $post['slug'],
-			'link' => $post['post_url']
-			];
-			array_push($portfolios, $portfolio);
-		}
-
-		// $portfolios = Post::where('category_id','=','1')->get();
-		$blogs = Post::where('category_id','=','2')->get();
 		return View::make('index')->with('blogs',$blogs)->with('portfolios',$portfolios);
 	}
 
 	public function getDevMenu()
 	{
-		// $consumer_key = 'Etkk7hgob55TMDhK6f6dZuQkJoJ8HL5uj4kqwrPvmWJ8lof5v8';
-		// $secret_key = 'mo6hLpAaVElUmeXPcwuhQfo00rtgObLuNNJkewy0BmRAq7yACS';
-		// for portfolio
-		$portfolios = array();
-		$api_key = 'Etkk7hgob55TMDhK6f6dZuQkJoJ8HL5uj4kqwrPvmWJ8lof5v8';
-		$tag = 'portfolio';
-		$url = 'api.tumblr.com/v2/blog/akbarisanto.tumblr.com/posts?api_key='.$api_key.'&tag='.$tag;
-		$curl = curl_init($url);
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-		$posts_res = curl_exec($curl);
-		curl_close($curl);
-		$posts_resj = json_decode($posts_res,true);
-		$posts = $posts_resj['response']['posts'];
+		$portfolios = $this->getTumblrPost('portfolio');
+		$blogs = $this->getTumblrPost('blog');
 
-		foreach ($posts as $post) {
-			$portfolio = [
-			'id' => $post['id'],
-			'title' => $post['slug'],
-			'content' => $post['slug'],
-			'link' => $post['post_url']
-			];
-			array_push($portfolios, $portfolio);
-		}
-
-		// $portfolios = Post::where('category_id','=','1')->get();
-		$blogs = Post::where('category_id','=','2')->get();
 		return View::make('dev/menu/index')->with('blogs',$blogs)->with('portfolios',$portfolios);
+	}
+
+	public function getDevOri()
+	{
+		$portfolios = $this->getTumblrPost('portfolio');
+		$blogs = $this->getTumblrPost('blog');
+
+		return View::make('dev/ori/index')->with('blogs',$blogs)->with('portfolios',$portfolios);
 	}
 
 	public function postMail()
 	{
 		$input = Input::all();
+
+		// // Check for empty fields
+		// if(empty($input['name'])  		||
+		// 	empty($input['email']) 		||
+		// 	empty($input['phone']) 		||
+		// 	empty($input['message'])	||
+		// 	!filter_var($input['email'],FILTER_VALIDATE_EMAIL))
+		// {
+		// 	echo "No arguments Provided!";
+		// 	return false;
+		// }
 
 		$name = $input['name'];
 		$email_address = $input['email'];
@@ -100,8 +71,35 @@ class HomeController extends BaseController {
 			->subject('Website Contact Form');
 		});
 
-		return Redirect::to('/');
-
+		// return true;
 	}
+
+	public function getTumblrPost($tag) {
+		// $consumer_key = 'Etkk7hgob55TMDhK6f6dZuQkJoJ8HL5uj4kqwrPvmWJ8lof5v8';
+		// $secret_key = 'mo6hLpAaVElUmeXPcwuhQfo00rtgObLuNNJkewy0BmRAq7yACS';
+		$api_key = 'Etkk7hgob55TMDhK6f6dZuQkJoJ8HL5uj4kqwrPvmWJ8lof5v8';
+		$url = 'api.tumblr.com/v2/blog/akbarisanto.tumblr.com/posts?api_key='.$api_key.'&tag='.$tag;
+		$curl = curl_init($url);
+		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+		$posts_res = curl_exec($curl);
+		curl_close($curl);
+		$posts_resj = json_decode($posts_res,true);
+		$posts = $posts_resj['response']['posts'];
+
+		for($i = 0; $i < count($posts); $i ++) {
+			if (!array_key_exists('title', $posts[$i]))
+				$posts[$i]['title'] = $posts[$i]['slug'];
+			if (array_key_exists('body', $posts[$i]))
+				$posts[$i]['content'] = $posts[$i]['body'];
+			else if (array_key_exists('description', $posts[$i]))
+				$posts[$i]['content'] = $posts[$i]['description'];
+			else
+				$posts[$i]['content'] = $posts[$i]['slug'];
+		}
+
+		return $posts;
+	}
+
 
 }

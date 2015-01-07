@@ -2,9 +2,9 @@
 <html lang="en">
 
 <head>
-	<!-- title and favicon -->
-	<title>Akbarisanto</title>
-	<link rel="icon" href="{{asset('assets/img/RA_logo_red.png')}}" type="image/png" sizes="16x16">
+    <!-- title and favicon -->
+    <title>Akbarisanto</title>
+    <link rel="icon" href="{{asset('assets/img/RA_logo_red.png')}}" type="image/png" sizes="16x16">
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -37,11 +37,11 @@
 
 <body id="page-top" class="index">
 
-	@if(Session::has('message'))
-	<div id="message">{{ Session::get('message') }}</div>
-	@endif
+    @if(Session::has('message'))
+    <div id="message">{{ Session::get('message') }}</div>
+    @endif
 
-	@yield('content')
+    @yield('content')
 
     <!-- jQuery -->
     <script src="{{ asset('assets/js/jquery.js')}}"></script>
@@ -56,7 +56,7 @@
 
     <!-- Contact Form JavaScript -->
     <script src="{{ asset('assets/js/jqBootstrapValidation.js')}}"></script>
-    <script src="{{ asset('assets/js/contact_me.js')}}"></script>
+    <script src="{{ asset('assets/js/contact_me_dev.js')}}"></script>
 
     <!-- Custom Theme JavaScript -->
     <script src="{{ asset('assets/js/freelancer.js')}}"></script>

@@ -14,6 +14,7 @@
 Route::get('/', 'HomeController@getHome');
 Route::get('home', 'HomeController@getHome');
 Route::get('dev/menu', 'HomeController@getDevMenu');
+Route::get('dev/ori', 'HomeController@getDevOri');
 Route::post('mail', 'HomeController@postMail');
 
 Route::controller('admin/portfolio', 'PortfolioController');
