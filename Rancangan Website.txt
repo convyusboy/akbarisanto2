@@ -1,0 +1,8 @@
+Rancangan Website
+
+- Wave Menu di bawah
+- contact me circular progress button
+- Awal Buka dari bawah
+- Scroll ke atas / reverse
+- portfolio masonry
+- blog?
