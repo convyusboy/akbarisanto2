@@ -53,10 +53,14 @@
     <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.3/jquery.easing.min.js"></script>
     <script src="{{ asset('assets/js/classie.js')}}"></script>
     <script src="{{ asset('assets/js/cbpAnimatedHeader.js')}}"></script>
+    <script src="{{ asset('assets/js/imgLiquid-min.js')}}"></script>
 
     <!-- Contact Form JavaScript -->
     <script src="{{ asset('assets/js/jqBootstrapValidation.js')}}"></script>
     <script src="{{ asset('assets/js/contact_me.js')}}"></script>
+
+    <!-- Header JavaScript -->
+    <script src="{{ asset('assets/js/header.js')}}"></script>
 
     <!-- Custom Theme JavaScript -->
     <script src="{{ asset('assets/js/freelancer.js')}}"></script>

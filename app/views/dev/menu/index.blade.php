@@ -27,7 +27,17 @@
 				<div class="codrop-links container">
 					<div class="row">
 						<div class="col-lg-12">
-							<img class="img-responsive" src="{{asset('assets/img/RA_logo_red_circle2.png')}}" alt="">
+							<div id="imgLiquids">
+								<div id="imgLiquid1" class="imgLiquidFill imgLiquid">
+									<img id="pic1" class="img-responsive" src="{{asset('assets/photo/me/img1.jpg')}}" alt="">
+								</div>
+								<div id="imgNonLiquid">
+									<img class="img-responsive" src="{{asset('assets/img/RA_logo_red_circle2.png')}}" alt="">
+								</div>
+								<div id="imgLiquid2" class="imgLiquidFill imgLiquid">
+									<img id="pic2" class="img-responsive" src="{{asset('assets/photo/me/img2.jpg')}}" alt="">
+								</div>
+							</div>
 							<div class="intro-text">
 								<span class="name">Ridho Akbarisanto</span>
 								<hr class="star-light">

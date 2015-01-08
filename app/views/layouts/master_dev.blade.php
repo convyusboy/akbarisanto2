@@ -60,6 +60,7 @@
     <script src="{{ asset('assets/js/jquery.easing.min.js')}}"></script>
     <script src="{{ asset('assets/js/classie.js')}}"></script>
     <script src="{{ asset('assets/js/cbpAnimatedHeader.js')}}"></script>
+    <script src="{{ asset('assets/js/imgLiquid-min.js')}}"></script>
 
     <!-- Custom Theme JavaScript -->
     <script src="{{ asset('assets/js/freelancer.js')}}"></script>
@@ -67,6 +68,9 @@
     <!-- Contact Form JavaScript -->
     <script src="{{ asset('assets/js/jqBootstrapValidation.js')}}"></script>
     <script src="{{ asset('assets/js/contact_me_dev.js')}}"></script>
+
+    <!-- Header JavaScript -->
+    <script src="{{ asset('assets/js/header_dev.js')}}"></script>
 
     <!-- Custom Menu JavaScript -->
     <script src="{{ asset('assets/js/main3.js')}}"></script>

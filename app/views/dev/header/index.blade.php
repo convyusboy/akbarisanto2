@@ -53,9 +53,7 @@
 					<div id="imgLiquid1" class="imgLiquidFill imgLiquid">
 						<img id="pic1" class="img-responsive" src="{{asset('assets/photo/me/img1.jpg')}}" alt="">
 					</div>
-					<div id="imgNonLiquid">
-						<img class="img-responsive" src="{{asset('assets/img/RA_logo_red_circle2.png')}}" alt="">
-					</div>
+					<img id="imgNonLiquid" class="img-responsive" src="{{asset('assets/img/RA_logo_red_circle2.png')}}" alt="">
 					<div id="imgLiquid2" class="imgLiquidFill imgLiquid">
 						<img id="pic2" class="img-responsive" src="{{asset('assets/photo/me/img2.jpg')}}" alt="">
 					</div>

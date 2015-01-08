@@ -31,6 +31,14 @@ class HomeController extends BaseController {
 		return View::make('dev/menu/index')->with('blogs',$blogs)->with('portfolios',$portfolios);
 	}
 
+	public function getDevHeader()
+	{
+		$portfolios = $this->getTumblrPost('portfolio');
+		$blogs = $this->getTumblrPost('blog');
+
+		return View::make('dev/header/index')->with('blogs',$blogs)->with('portfolios',$portfolios);
+	}
+
 	public function getDevOri()
 	{
 		$portfolios = $this->getTumblrPost('portfolio');
