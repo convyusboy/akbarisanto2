@@ -253,5 +253,135 @@ a, a:hover, a:focus, a:active, a.active {
 
 #imgNonLiquid {
     position: relative;
-    z-index: 99;
+    z-index: 99;x
 }
+
+#filters button {
+/*    background: #700000;
+    color: #ffffff;*/
+    -moz-box-shadow:inset 0px 34px 0px -15px #700000;
+    -webkit-box-shadow:inset 0px 34px 0px -15px #700000;
+    box-shadow:inset 0px 34px 0px -15px #700000;
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #700000), color-stop(1, #700000));
+    background:-moz-linear-gradient(top, #700000 5%, #700000 100%);
+    background:-webkit-linear-gradient(top, #700000 5%, #700000 100%);
+    background:-o-linear-gradient(top, #700000 5%, #700000 100%);
+    background:-ms-linear-gradient(top, #700000 5%, #700000 100%);
+    background:linear-gradient(to bottom, #700000 5%, #700000 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#700000', endColorstr='#700000',GradientType=0);
+    background-color:#700000;
+    /*border:1px solid #241d13;*/
+    border:none;
+    display:inline-block;
+    cursor:pointer;
+    color:#ffffff;
+    font-family:Arial;
+    font-size:15px;
+    font-weight:bold;
+    padding:8px 23px;
+    text-decoration:none;
+    text-shadow:0px -1px 0px #700000;
+
+}
+
+#filters button:hover {
+    background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #700000), color-stop(1, #700000));
+    background:-moz-linear-gradient(top, #700000 5%, #700000 100%);
+    background:-webkit-linear-gradient(top, #700000 5%, #700000 100%);
+    background:-o-linear-gradient(top, #700000 5%, #700000 100%);
+    background:-ms-linear-gradient(top, #700000 5%, #700000 100%);
+    background:linear-gradient(to bottom, #700000 5%, #700000 100%);
+    filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#700000', endColorstr='#700000',GradientType=0);
+    background-color:#700000;    
+}
+
+#filters button:active {
+    position:relative;
+    top:1px;
+}
+
+.item {
+    width: 30%;
+    text-align: center;
+    background: #D6DAD9;
+    padding: 20px;
+}
+
+.portfolio-link {
+    /*padding: 20px;*/
+}
+
+
+.item2 { 
+    width: 48%;  
+    margin-bottom: 20px;
+    padding: 20px;
+    color: #ffffff;
+}
+
+.item2 {
+    border: 2px #000000;
+    background: #5F6363;
+}
+
+.item2 #title {
+    text-align: center;
+}
+
+.item2 #content img {
+/*    text-align: center;
+    float: left; 
+    margin-right: 1em;
+    margin-bottom: 1em;
+    width: 50%;
+*/}
+
+.item a:hover {
+    text-decoration: none;
+}
+
+.align-left {
+    float: left; 
+    margin-right: 1em;
+    margin-bottom: 1em;
+    width: 50%;
+}
+
+.btn input[type="radio"] {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+    filter: alpha(opacity=0);
+}
+
+hr.star-secondary {
+    margin: 25px auto 30px;
+    padding: 0;
+    max-width: 250px;
+    border: 0;
+    border-top: solid 5px;
+    text-align: center;
+}
+
+hr.star-secondary:after {
+    content: "\f005";
+    display: inline-block;
+    position: relative;
+    top: -.8em;
+    padding: 0 .25em;
+    font-family: FontAwesome;
+    font-size: 2em;
+}
+
+hr.star-secondary {
+    border-color: #2c3e50;
+}
+
+hr.star-secondary:after {
+    color: #2c3e50;
+    background-color: #D6DAD9;
+}
+
+.modal-backdrop {
+    position: relative;
+ }

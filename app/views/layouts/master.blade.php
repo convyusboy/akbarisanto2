@@ -54,6 +54,50 @@
     <script src="{{ asset('assets/js/classie.js')}}"></script>
     <script src="{{ asset('assets/js/cbpAnimatedHeader.js')}}"></script>
     <script src="{{ asset('assets/js/imgLiquid-min.js')}}"></script>
+    <script src="{{ asset('assets/js/isotope.pkgd.min.js')}}"></script>
+    <script type="text/javascript">
+    $( function() {
+        var $container = $('#container').isotope({
+            // options
+            itemSelector: '.item',
+            layoutMode: 'fitRows'
+        });
+
+        $('.filters').on( 'click', 'input', function() {
+            var filterValue = this.value;
+            $container.isotope({ filter: filterValue });
+        });
+    });
+
+        var $container2 = $('#container2');
+        // initialize
+        $container2.masonry({
+            // columnWidth: 10,
+            itemSelector: '.item2',
+            gutter: 20
+        });
+    </script>
+    <script type="text/javascript">
+  Button.prototype.toggle = function () {
+    var changed = true
+    var $parent = this.$element.closest('[data-toggle="tombol"]')
+
+    if ($parent.length) {
+      var $input = this.$element.find('input')
+      if ($input.prop('type') == 'radio') {
+        if ($input.prop('checked') && this.$element.hasClass('active')) changed = false
+        else $parent.find('.active').removeClass('active')
+      }
+      if (changed) $input.prop('checked', !this.$element.hasClass('active')).trigger('change')
+    } else {
+      this.$element.attr('aria-pressed', !this.$element.hasClass('active'))
+    }
+
+    if (changed) this.$element.toggleClass('active')
+  }
+
+
+    </script>
 
     <!-- Contact Form JavaScript -->
     <script src="{{ asset('assets/js/jqBootstrapValidation.js')}}"></script>

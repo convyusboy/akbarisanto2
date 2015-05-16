@@ -50,15 +50,15 @@
 		<div class="row">
 			<div class="col-lg-12">
 				<div id="imgLiquids">
-					<div id="imgLiquid1" class="imgLiquidFill imgLiquid">
+<!-- 					<div id="imgLiquid1" class="imgLiquidFill imgLiquid">
 						<img id="pic1" class="img-responsive" src="{{asset('assets/photo/me/img1.jpg')}}" alt="">
-					</div>
+					</div> -->
 					<div id="imgNonLiquid">
 						<img class="img-responsive" src="{{asset('assets/img/RA_logo_red_circle2.png')}}" alt="">
 					</div>
-					<div id="imgLiquid2" class="imgLiquidFill imgLiquid">
+<!-- 					<div id="imgLiquid2" class="imgLiquidFill imgLiquid">
 						<img id="pic2" class="img-responsive" src="{{asset('assets/photo/me/img2.jpg')}}" alt="">
-					</div>
+					</div> -->
 				</div>
 				<div class="intro-text">
 					<span class="name">Ridho Akbarisanto</span>
@@ -79,16 +79,63 @@
 				<hr class="star-primary">
 			</div>
 		</div>
-		<div class="row">
-			<?php foreach ($portfolios as $portfolio) { ?>
-			<div class="col-sm-4 portfolio-item">
+	    <div class="row">
+            <div class="btn-group filters" data-toggle="tombol">
+                <label class="btn btn-default">
+                    <input type="radio" name="filter" value="*"/> Show All
+                </label> 
+                <label class="btn btn-default">
+                    <input type="radio" name="filter" value=".game"/> Game
+                </label> 
+                <label class="btn btn-default">
+                    <input type="radio" name="filter" value=".web"/> Web
+                </label> 
+                <label class="btn btn-default">
+                    <input type="radio" name="filter" value=".android"/> Android
+                </label> 
+	        </div>
+    	</div>
+
+	<!-- 		<div id="filters" class="button-group">
+				<button data-filter="*">Show All</button>
+				<button data-filter="*">Show All</button>
+				<button data-filter=".game">Game</button>
+				<button data-filter=".web">Web</button>
+				<button data-filter=".android">Android</button>
+			</div> -->
+		<br>
+		<div class="row" id="container">
+			<?php foreach ($portfolios as $portfolio) { 
+				$start = strpos($portfolio['content'],"<img");
+				$end = strpos($portfolio['content'],"/>", $start)+2;
+				$photo = substr($portfolio['content'],$start,$end-$start);
+
+				$start2 = strpos($photo,"src")+5;
+				$end2 = strlen($photo)-3;
+				$photo_src = substr($photo,$start2,$end2-$start2);
+
+				$tags = "";
+				foreach ($portfolio['tags'] as $tag) {
+					$tags = $tags . ' ' . $tag;
+				}
+				?>
+			<div class="portfolio-item item{{$tags}}">
 				<a href="#portfolioModal{{$portfolio['id']}}" class="portfolio-link" data-toggle="modal">
 					<div class="caption">
 						<div class="caption-content">
 							<i class="fa fa-search-plus fa-3x"></i>
 						</div>
 					</div>
-					<img src="{{asset('assets/photo/default.jpg')}}" class="img-responsive" alt="">
+					@if($start === false)
+						<img src="{{asset('assets/photo/default.jpg')}}" class="img-responsive" alt="">
+					@else
+						<img src="{{$photo_src}}" class="img-responsive" alt="">
+					@endif
+					<div id="title">
+						<h3>
+							{{$portfolio['title']}}
+						</h3>
+					</div>
 				</a>
 			</div>
 			<?php } ?>
@@ -103,24 +150,31 @@
 		<div class="row">
 			<div class="col-lg-12 text-center">
 				<h2>Blog</h2>
-				<hr class="star-primary">
+				<hr class="star-secondary">
 			</div>
 		</div>
-		<div class="row">
-			<?php foreach ($blogs as $blog) { $photo = Photo::where('post_id','=',$blog->id)->first(); ?>
-			<div class="col-sm-4 blog-item">
-				<a href="#blogModal{{$blog->id}}" class="blog-link" data-toggle="modal">
-					<div class="caption">
-						<div class="caption-content">
-							<i class="fa fa-search-plus fa-3x"></i>
-						</div>
-					</div>
-					@if(count($photo)>0)
-					<img src="{{asset('assets/photo/'.$photo->id.'.jpg')}}" class="img-responsive" alt="">
-					@else
-					<img src="{{asset('assets/photo/default.jpg')}}" class="img-responsive" alt="">
-					@endif
-				</a>
+		<div class="row" id="container2">
+			<?php foreach ($blogs as $blog) { 
+				$start3 = strpos($blog['content'],"<img");
+				$end3 = strpos($blog['content'],"/>", $start3)+2;
+				$photo3 = substr($blog['content'],$start3,$end3-$start3);
+
+				$start4 = strpos($photo3,"src")+5;
+				$end4 = strlen($photo3)-3;
+				$photo_src4 = substr($photo3,$start4,$end4-$start4);
+			?>
+			<div class="item2">
+				<div id="title">
+					<h3>
+						{{$blog['title']}}
+					</h3>
+				</div>
+<!-- 				@if(strlen($start3)>0)
+				<img class="align-left" src="{{$photo_src4}}" class="img-responsive" alt="">
+				@endif -->
+				<div id="content">
+					{{$blog['content']}}
+				</div>
 			</div>
 			<?php } ?>
 
@@ -212,28 +266,43 @@
 						@lang('messages.address2')</p>
 					</div>
 					<div class="footer-col col-md-4">
-						<h3>Online Accounts</h3>
+						<h3>Accounts</h3>
 						<ul class="list-inline">
 							<li>
 								<a href="https://www.facebook.com/akbarisanto" class="btn-social btn-outline"><i class="fa fa-fw fa-facebook"></i></a>
 							</li>
 							<li>
-								<a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-google-plus"></i></a>
+								<a href="https://plus.google.com/+RidhoAkbarisanto17" class="btn-social btn-outline"><i class="fa fa-fw fa-google-plus"></i></a>
 							</li>
 							<li>
 								<a href="https://twitter.com/convyusboy" class="btn-social btn-outline"><i class="fa fa-fw fa-twitter"></i></a>
 							</li>
 							<li>
-								<a href="https://www.linkedin.com/profile/view?id=319779441&trk=nav_responsive_tab_profile" class="btn-social btn-outline"><i class="fa fa-fw fa-linkedin"></i></a>
+								<a href="https://id.linkedin.com/in/akbarisanto" class="btn-social btn-outline"><i class="fa fa-fw fa-linkedin"></i></a>
 							</li>
 							<li>
-								<a href="#" class="btn-social btn-outline"><i class="fa fa-fw fa-dribbble"></i></a>
+								<a href="https://instagram.com/convyusboy" class="btn-social btn-outline"><i class="fa fa-fw fa-instagram"></i></a>
+							</li>
+							<li>
+								<a href="http://akbarisanto.tumblr.com/" class="btn-social btn-outline"><i class="fa fa-fw fa-tumblr"></i></a>
+							</li>
+							<li>
+								<a href="https://soundcloud.com/akbarisanto" class="btn-social btn-outline"><i class="fa fa-fw fa-soundcloud"></i></a>
+							</li>
+							<li>
+								<a href="https://github.com/convyusboy" class="btn-social btn-outline"><i class="fa fa-fw fa-github"></i></a>
+							</li>
+							<li>
+								<a href="https://bitbucket.com/convyusboy" class="btn-social btn-outline"><i class="fa fa-fw fa-bitbucket"></i></a>
 							</li>
 						</ul>
 					</div>
 					<div class="footer-col col-md-4">
-						<h3>Others</h3>
-						<p></p>
+						<h3>Using</h3>
+						<p>Template : <a href="http://startbootstrap.com/template-overviews/freelancer/">Start Bootstrap</a><br>
+							Libraries : <a href="http://masonry.desandro.com/">Masonry</a>, <a href="http://isotope.metafizzy.co/">Isotope</a><br>
+							Data : <a href="https://www.tumblr.com/developers">tumblr</a></a>
+						</p>
 					</div>
 				</div>
 			</div>
@@ -242,7 +311,7 @@
 			<div class="container">
 				<div class="row">
 					<div class="col-lg-12">
-						Copyright &copy; Your Website 2014
+						Copyright &copy; Ridho Akbarisanto 2015
 					</div>
 				</div>
 			</div>
@@ -274,7 +343,7 @@
 							<div class="modal-body">
 								<h2>{{$portfolio['title']}}</h2>
 								<hr class="star-primary">
-								<img src="{{asset('assets/photo/default.jpg')}}" class="img-responsive img-centered" alt="">
+								<!-- <img src="{{asset('assets/photo/default.jpg')}}" class="img-responsive img-centered" alt=""> -->
 
 								<p>{{$portfolio['content']}}</p>
 								<ul class="list-inline item-details">
@@ -300,50 +369,5 @@
 		</div>
 		<?php } ?>
 
-		<!-- Blog Modals -->
-		<?php foreach ($blogs as $blog) { $photo = Photo::where('post_id','=',$blog->id)->first(); ?>
-		<div class="blog-modal modal fade" id="blogModal{{$blog->id}}" tabindex="-1" role="dialog" aria-hidden="true">
-			<div class="modal-content">
-				<div class="close-modal" data-dismiss="modal">
-					<div class="lr">
-						<div class="rl">
-						</div>
-					</div>
-				</div>
-				<div class="container">
-					<div class="row">
-						<div class="col-lg-8 col-lg-offset-2">
-							<div class="modal-body">
-								<h2>{{$blog->title}}</h2>
-								<hr class="star-primary">
-								@if(count($photo)>0)
-								<img src="{{asset('assets/photo/'.$photo->id.'.jpg')}}" class="img-responsive img-centered" alt="">
-								@else
-								<img src="{{asset('assets/photo/default.jpg')}}" class="img-responsive img-centered" alt="">
-								@endif
-
-								<p>{{$blog->content}}</p>
-								<ul class="list-inline item-details">
-									<li>Client:
-										<strong><a href="http://startbootstrap.com">Akbarisanto</a>
-										</strong>
-									</li>
-									<li>Date:
-										<strong><a href="http://startbootstrap.com">April 2014</a>
-										</strong>
-									</li>
-									<li>Service:
-										<strong><a href="http://startbootstrap.com">Web Development</a>
-										</strong>
-									</li>
-								</ul>
-								<button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i> Close</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<?php } ?>
 
 		@stop

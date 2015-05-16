@@ -803,6 +803,16 @@ a.sb.vimeo,
 	background-image: url('../img/vimeo.png');
 }
 
+a.sb.askfm,
+.sb a.askfm {
+	background-image: url('../img/askfm.png');
+}
+
+a.sb.tumblr,
+.sb a.tumblr {
+	background-image: url('../img/tumblr.png');
+}
+
 /* white icons */
 a.sb.blue.twitter,
 .sb.blue a.twitter,
@@ -1082,6 +1092,48 @@ a.sb.black.bitbucket,
 a.sb.gray.bitbucket,
 .sb.gray a.bitbucket {
 	background-image: url('../img/white_bitbucket.png');
+}
+
+a.sb.blue.askfm,
+.sb.blue a.askfm,
+a.sb.purple.askfm,
+.sb.purple a.askfm,
+a.sb.light-purple.askfm,
+.sb.light-purple a.askfm,
+a.sb.red.askfm,
+.sb.red a.askfm,
+a.sb.green.askfm,
+.sb.green a.askfm,
+a.sb.orange.askfm,
+.sb.orange a.askfm,
+a.sb.brown.askfm,
+.sb.brown a.askfm,
+a.sb.black.askfm,
+.sb.black a.askfm,
+a.sb.gray.askfm,
+.sb.gray a.askfm {
+	background-image: url('../img/white_askfm.png');
+}
+
+a.sb.blue.tumblr,
+.sb.blue a.tumblr,
+a.sb.purple.tumblr,
+.sb.purple a.tumblr,
+a.sb.light-purple.tumblr,
+.sb.light-purple a.tumblr,
+a.sb.red.tumblr,
+.sb.red a.tumblr,
+a.sb.green.tumblr,
+.sb.green a.tumblr,
+a.sb.orange.tumblr,
+.sb.orange a.tumblr,
+a.sb.brown.tumblr,
+.sb.brown a.tumblr,
+a.sb.black.tumblr,
+.sb.black a.tumblr,
+a.sb.gray.tumblr,
+.sb.gray a.tumblr {
+	background-image: url('../img/white_tumblr.png');
 }
 
 
